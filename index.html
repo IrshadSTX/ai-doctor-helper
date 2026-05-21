@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>AI Doctor Helper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    input, textarea { font-family: inherit; outline: none; border: none; background: none; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── LOGO-DERIVED THEME ──────────────────────────────────── */
+    /* Light: crisp white + forest green primary + gold accent + cyan AI */
+    :root {
+      --bg:           #F2FAF6;
+      --card:         #FFFFFF;
+      --card2:        #E8F5EE;
+      --primary:      #0B6B43;
+      --primary-soft: #DCF2E8;
+      --gold:         #C9A227;
+      --gold-soft:    #FDF6DC;
+      --teal:         #00B89A;
+      --teal-soft:    #DCF8F3;
+      --text:         #081A10;
+      --text-muted:   #3D6652;
+      --text-xmuted:  #7AA48E;
+      --border:       #C8E6D6;
+      --shadow:       0 2px 16px rgba(11,107,67,0.1);
+      --shadow-sm:    0 1px 6px rgba(0,0,0,0.06);
+      --shadow-lg:    0 8px 40px rgba(11,107,67,0.18);
+      --input-bg:     #EEF8F3;
+      --nav-bg:       rgba(255,255,255,0.85);
+      --danger:       #EF4444;
+      --success:      #10B981;
+      --splash-bg:    linear-gradient(155deg,#060E09 0%,#0B3A24 45%,#0D4A2E 75%,#0A3020 100%);
+      --hero-bg:      linear-gradient(155deg,#060E09 0%,#0B3A24 50%,#0D4A2E 100%);
+      --radius-sm:    8px;
+      --radius-md:    14px;
+      --radius-lg:    20px;
+      --radius-xl:    28px;
+    }
+    body.dark {
+      --bg:           #060E09;
+      --card:         #0D1F14;
+      --card2:        #112419;
+      --primary:      #00D4A8;
+      --primary-soft: #092B20;
+      --gold:         #D4A843;
+      --gold-soft:    #1E1500;
+      --teal:         #2DD4BF;
+      --teal-soft:    #061C18;
+      --text:         #E8F5EE;
+      --text-muted:   #7AA48E;
+      --text-xmuted:  #4A7560;
+      --border:       #1A3528;
+      --shadow:       0 2px 16px rgba(0,0,0,0.4);
+      --shadow-sm:    0 1px 6px rgba(0,0,0,0.3);
+      --shadow-lg:    0 8px 40px rgba(0,0,0,0.5);
+      --input-bg:     #0D1F14;
+      --nav-bg:       rgba(6,14,9,0.92);
+      --splash-bg:    linear-gradient(155deg,#030806 0%,#081A10 50%,#0A2418 100%);
+      --hero-bg:      linear-gradient(155deg,#030806 0%,#081A10 50%,#0A2418 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #030806;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .phone-frame {
+      width: 393px;
+      height: 852px;
+      background: var(--bg);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,162,39,0.15) inset;
+      transition: background 0.3s;
+    }
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 34px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      z-index: 9999;
+    }
+
+    /* ── SCREENS ─────────────────────────────────────────────── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .screen.active { display: flex; }
+    .screen-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .screen-body::-webkit-scrollbar { display: none; }
+
+    /* ── STATUS BAR ──────────────────────────────────────────── */
+    .status-bar {
+      height: 44px;
+      padding: 14px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .status-bar .time { font-size: 15px; font-weight: 600; color: var(--text); }
+    .status-icons { display: flex; align-items: center; gap: 6px; color: var(--text); }
+    .status-bar.light-bar .time { color: #fff; }
+    .status-bar.light-bar .status-icons { color: #fff; }
+
+    /* ── TYPOGRAPHY ──────────────────────────────────────────── */
+    .h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+    .h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+    .caption { font-size: 12px; color: var(--text-muted); }
+
+    /* ── BUTTONS ─────────────────────────────────────────────── */
+    .btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      height: 52px; border-radius: var(--radius-md);
+      font-size: 15px; font-weight: 600;
+      transition: all 0.18s; width: 100%;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 18px rgba(11,107,67,0.3); }
+    body.dark .btn-primary { box-shadow: 0 4px 18px rgba(0,212,168,0.25); }
+    .btn-gold { background: var(--gold); color: #fff; box-shadow: 0 4px 18px rgba(201,162,39,0.35); }
+    .btn-outline { background: var(--card); color: var(--text); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn:active { opacity: 0.88; }
+
+    /* ── INPUTS ──────────────────────────────────────────────── */
+    .input-group { position: relative; margin-bottom: 12px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .input-field {
+      width: 100%; height: 52px; background: var(--input-bg);
+      border: 1.5px solid var(--border); border-radius: var(--radius-md);
+      padding: 0 48px 0 16px; font-size: 15px; color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field::placeholder { color: var(--text-xmuted); }
+    .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11,107,67,0.12); background: var(--card); }
+    body.dark .input-field:focus { box-shadow: 0 0 0 3px rgba(0,212,168,0.12); }
+    .input-icon { position: absolute; right: 14px; bottom: 14px; color: var(--text-muted); cursor: pointer; }
+
+    /* ── CARDS ───────────────────────────────────────────────── */
+    .card { background: var(--card); border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); }
+
+    /* ── DIVIDER ─────────────────────────────────────────────── */
+    .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .divider span { font-size: 12px; color: var(--text-xmuted); }
+
+    /* ── AVATARS ─────────────────────────────────────────────── */
+    .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .avatar-sm  { width: 36px; height: 36px; font-size: 13px; }
+    .avatar-md  { width: 44px; height: 44px; font-size: 16px; }
+    .avatar-lg  { width: 64px; height: 64px; font-size: 22px; }
+    .avatar-xl  { width: 80px; height: 80px; font-size: 28px; }
+    .avatar-1  { background: linear-gradient(135deg,#0B6B43,#00B89A); }
+    .avatar-2  { background: linear-gradient(135deg,#C9A227,#E8C84A); }
+    .avatar-3  { background: linear-gradient(135deg,#006B5A,#00D4A8); }
+    .avatar-4  { background: linear-gradient(135deg,#3A6B45,#6BBF7A); }
+    .avatar-doc { background: linear-gradient(135deg,#0B6B43,#C9A227); }
+    .avatar-ai  { background: linear-gradient(135deg,#00B89A,#00D4A8); }
+
+    /* ── BADGES ──────────────────────────────────────────────── */
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .badge-green { background: var(--primary-soft); color: var(--primary); }
+    .badge-gold  { background: var(--gold-soft);    color: var(--gold); }
+    .badge-teal  { background: var(--teal-soft);    color: var(--teal); }
+    .badge-warn  { background: #FEF3C7; color: #D97706; }
+    body.dark .badge-warn { background: #2D1F00; color: #FBBF24; }
+
+    /* ── BOTTOM NAV ──────────────────────────────────────────── */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 82px; background: var(--nav-bg);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 8px 20px; z-index: 100; flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 16px; border-radius: var(--radius-md);
+      transition: all 0.2s; flex: 1;
+    }
+    .nav-item svg { color: var(--text-xmuted); transition: color 0.2s; }
+    .nav-item .nav-label { font-size: 10px; font-weight: 500; color: var(--text-xmuted); transition: color 0.2s; }
+    .nav-item.active svg { color: var(--primary); }
+    .nav-item.active .nav-label { color: var(--primary); font-weight: 700; }
+    .nav-item.active { background: var(--primary-soft); }
+
+    /* ── FAB ─────────────────────────────────────────────────── */
+    .fab {
+      position: absolute; bottom: 98px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--gold); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 24px rgba(201,162,39,0.45);
+      z-index: 50; transition: transform 0.2s;
+    }
+    .fab:active { transform: scale(0.92); }
+
+    /* ── SECTION HEADER ──────────────────────────────────────── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-bottom: 12px; }
+    .section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.7px; padding: 0 20px; margin-bottom: 10px; }
+
+    /* ── APP HEADER ──────────────────────────────────────────── */
+    .app-header { padding: 6px 20px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--card); border-bottom: 1px solid var(--border); }
+    .back-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--input-bg); display: flex; align-items: center; justify-content: center; color: var(--text); transition: background 0.15s; }
+    .back-btn:active { background: var(--border); }
+
+    /* ── SEARCH BAR ──────────────────────────────────────────── */
+    .search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--input-bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius-md); padding: 0 14px; height: 46px;
+      margin: 0 20px 20px; transition: border-color 0.2s;
+    }
+    .search-bar:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11,107,67,0.1); }
+    .search-bar input { flex: 1; font-size: 14px; color: var(--text); }
+    .search-bar input::placeholder { color: var(--text-xmuted); }
+    .search-bar svg { color: var(--text-muted); flex-shrink: 0; }
+
+    /* ── PATIENT CARDS ───────────────────────────────────────── */
+    .patient-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px;
+      margin: 0 20px 10px; box-shadow: var(--shadow-sm);
+      transition: all 0.18s; cursor: pointer;
+    }
+    .patient-card:active { transform: scale(0.98); box-shadow: none; }
+    .patient-card-body { flex: 1; min-width: 0; }
+    .patient-card-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .patient-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .patient-card-diag { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .patient-card-time { font-size: 11px; color: var(--text-xmuted); margin-top: 4px; }
+
+    /* ── SETTINGS ────────────────────────────────────────────── */
+    .settings-list { padding: 0 20px; }
+    .settings-item { display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--border); }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .settings-label { flex: 1; font-size: 15px; font-weight: 500; color: var(--text); }
+
+    /* ── TOGGLE ──────────────────────────────────────────────── */
+    .toggle { width: 48px; height: 28px; background: var(--border); border-radius: 999px; position: relative; transition: background 0.25s; flex-shrink: 0; cursor: pointer; }
+    .toggle.on { background: var(--primary); }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform 0.25s; }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* ── CHAT BUBBLES ────────────────────────────────────────── */
+    .chat-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px 16px 24px; display: flex; flex-direction: column; gap: 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .chat-area::-webkit-scrollbar { display: none; }
+    .bubble-row { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
+    .bubble-row.doctor { flex-direction: row-reverse; justify-content: flex-start; }
+    .bubble-wrap { display: flex; flex-direction: column; max-width: 78%; }
+    .bubble-row.doctor .bubble-wrap { align-items: flex-end; }
+    .bubble { border-radius: 20px; padding: 11px 15px; font-size: 14px; line-height: 1.6; word-break: break-word; }
+    .bubble-ai {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+    body.dark .bubble-ai { box-shadow: 0 2px 10px rgba(0,0,0,0.25); }
+    .bubble-doctor {
+      background: linear-gradient(135deg, var(--primary) 0%, #0a8f5a 100%);
+      color: #fff;
+      border-bottom-right-radius: 5px;
+      box-shadow: 0 3px 14px rgba(11,107,67,0.35);
+    }
+    body.dark .bubble-doctor { box-shadow: 0 3px 14px rgba(0,212,168,0.25); }
+    .bubble-time { font-size: 10px; color: var(--text-xmuted); margin-top: 5px; padding: 0 4px; }
+    .bubble-row.doctor .bubble-time { text-align: right; color: var(--text-xmuted); }
+
+    /* ── COLLAPSIBLES ────────────────────────────────────────── */
+    .collapsible-group { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .collapsible { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .collapsible-header { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; background: var(--input-bg); cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text); user-select: none; }
+    .collapsible-header .caret { width: 16px; height: 16px; color: var(--text-muted); transition: transform 0.22s; flex-shrink: 0; }
+    .collapsible.open .collapsible-header .caret { transform: rotate(180deg); }
+    .collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.28s ease, padding 0.28s; background: var(--card); font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .collapsible.open .collapsible-body { max-height: 300px; padding: 10px 13px 12px; }
+
+    /* ── CHIPS ───────────────────────────────────────────────── */
+    .chips-row { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; scrollbar-width: none; flex-shrink: 0; border-top: 1px solid var(--border); }
+    .chips-row::-webkit-scrollbar { display: none; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; padding: 7px 13px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-soft); color: var(--primary); border: 1px solid rgba(11,107,67,0.2); transition: all 0.15s; cursor: pointer; flex-shrink: 0; }
+    .chip:active { background: var(--primary); color: #fff; transform: scale(0.96); }
+    body.dark .chip { border-color: rgba(0,212,168,0.2); }
+
+    /* ── INPUT BAR ───────────────────────────────────────────── */
+    .input-bar { display: flex; align-items: center; gap: 10px; padding: 10px 14px 12px; background: var(--card); border-top: 1px solid var(--border); flex-shrink: 0; }
+    .input-bar-field { flex: 1; background: var(--input-bg); border: 1.5px solid var(--border); border-radius: 24px; padding: 10px 16px; font-size: 14px; color: var(--text); resize: none; line-height: 1.4; transition: border-color 0.2s; }
+    .input-bar-field::placeholder { color: var(--text-xmuted); }
+    .input-bar-field:focus { border-color: var(--primary); }
+    .input-bar-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .input-bar-btn:active { transform: scale(0.9); }
+    .input-bar-btn.icon-btn { color: var(--text-muted); background: var(--input-bg); }
+    .input-bar-btn.send-btn { background: var(--primary); color: #fff; }
+
+    /* ── TYPING INDICATOR ────────────────────────────────────── */
+    .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 12px 15px; }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-xmuted); animation: typingBlink 1.2s infinite ease-in-out; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBlink { 0%,60%,100% { opacity:0.3; transform:scale(1); } 30% { opacity:1; transform:scale(1.25); } }
+
+    /* ── TIMELINE ────────────────────────────────────────────── */
+    .timeline { padding: 0 20px; }
+    .timeline-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: 15px; top: 30px; bottom: 0; width: 2px; background: var(--border); }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--primary-soft); border: 2px solid var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .timeline-body { flex: 1; padding-top: 4px; }
+    .timeline-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .timeline-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* ── REPORT CHIP ─────────────────────────────────────────── */
+    .report-chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: var(--radius-sm); background: var(--input-bg); border: 1px solid var(--border); font-size: 13px; color: var(--text); margin-right: 8px; margin-bottom: 8px; }
+
+    /* ── SPLASH ──────────────────────────────────────────────── */
+    #screen-splash { background: var(--splash-bg); align-items: center; justify-content: center; }
+    .splash-logo-wrap { position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; }
+    .splash-pulse  { position: absolute; inset: -14px; border-radius: 28px; border: 2px solid rgba(201,162,39,0.4); animation: pulse 2s ease-out infinite; }
+    .splash-pulse2 { position: absolute; inset: -30px; border-radius: 36px; border: 2px solid rgba(0,212,168,0.2); animation: pulse 2s ease-out infinite 0.8s; }
+    @keyframes pulse { 0% { transform:scale(1); opacity:1; } 100% { transform:scale(1.5); opacity:0; } }
+    .splash-logo-img { width: 120px; height: 120px; border-radius: 32px; object-fit: cover; box-shadow: 0 8px 32px rgba(201,162,39,0.4); }
+    .splash-title { font-size: 26px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 6px; }
+    .splash-gold { color: var(--gold); }
+    .splash-sub { font-size: 14px; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
+    .splash-loader { margin-top: 52px; display: flex; gap: 6px; }
+    .splash-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(201,162,39,0.7); animation: splashDot 1.4s infinite ease-in-out; }
+    .splash-dot:nth-child(2) { animation-delay: 0.2s; background: rgba(0,212,168,0.7); }
+    .splash-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes splashDot { 0%,80%,100% { transform:scale(0.7); opacity:0.4; } 40% { transform:scale(1.3); opacity:1; } }
+
+    /* ── AUTH SCREENS ────────────────────────────────────────── */
+    #screen-login, #screen-signup { align-items: stretch; }
+    .auth-bg { width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; }
+    .auth-bg::-webkit-scrollbar { display: none; }
+    .auth-top { background: var(--hero-bg); padding: 54px 32px 36px; display: flex; flex-direction: column; align-items: center; gap: 14px; flex-shrink: 0; }
+    .auth-logo { width: 72px; height: 72px; border-radius: 22px; overflow: hidden; border: 1.5px solid rgba(201,162,39,0.4); box-shadow: 0 4px 20px rgba(201,162,39,0.25); }
+    .auth-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .auth-title { font-size: 22px; font-weight: 800; color: #fff; }
+    .auth-sub { font-size: 13px; color: rgba(255,255,255,0.65); }
+    .auth-card { background: var(--card); border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 28px 24px 32px; flex: 1; margin-top: -18px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; width: 100%; background: var(--card); border: 1.5px solid var(--border); color: var(--text); margin-bottom: 10px; box-shadow: var(--shadow-sm); transition: all 0.15s; }
+    .social-btn:active { background: var(--input-bg); transform: scale(0.98); }
+    .auth-footer { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-muted); }
+    .auth-footer a { color: var(--primary); font-weight: 600; cursor: pointer; }
+
+    /* ── DETAIL HERO ─────────────────────────────────────────── */
+    .detail-hero { background: var(--hero-bg); padding: 20px 20px 32px; display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
+    .detail-hero-top { display: flex; align-items: center; gap: 14px; }
+    .detail-hero-info { flex: 1; }
+    .detail-hero-name { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .detail-hero-meta { font-size: 13px; color: rgba(255,255,255,0.72); }
+    .detail-stats { display: flex; gap: 12px; }
+    .detail-stat { flex: 1; background: rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 12px; text-align: center; backdrop-filter: blur(8px); border: 1px solid rgba(201,162,39,0.2); }
+    .detail-stat-val { font-size: 20px; font-weight: 700; color: #fff; }
+    .detail-stat-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .detail-body { background: var(--bg); border-radius: var(--radius-xl) var(--radius-xl) 0 0; margin-top: -18px; flex: 1; padding-top: 24px; }
+    .detail-note { margin: 0 20px; background: var(--input-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .detail-section { margin-bottom: 24px; }
+
+    /* ── DETAIL CTA ──────────────────────────────────────────── */
+    .detail-cta-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 20px 28px; background: var(--card); border-top: 1px solid var(--border); }
+
+    /* ── CHAT HEADER ─────────────────────────────────────────── */
+    .chat-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .chat-header-info { flex: 1; min-width: 0; }
+    .chat-header-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .chat-header-meta { font-size: 12px; color: var(--text-muted); }
+    .view-records-btn { padding: 6px 14px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 12px; font-weight: 600; border: 1px solid rgba(11,107,67,0.2); white-space: nowrap; cursor: pointer; }
+    body.dark .view-records-btn { border-color: rgba(0,212,168,0.2); }
+
+    /* ── GLOBAL AI HEADER ────────────────────────────────────── */
+    .global-ai-header { background: var(--hero-bg); padding: 54px 20px 20px; flex-shrink: 0; }
+    .global-ai-header-inner { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .global-ai-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(201,162,39,0.18); border: 1px solid rgba(201,162,39,0.35); font-size: 12px; font-weight: 600; color: var(--gold); }
+    .global-ai-notice { display: flex; align-items: flex-start; gap: 8px; background: rgba(0,212,168,0.1); border: 1px solid rgba(0,212,168,0.25); border-radius: var(--radius-md); padding: 10px 14px; }
+    .global-ai-notice span { font-size: 12px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+    /* ── PROFILE ─────────────────────────────────────────────── */
+    .profile-hero { background: var(--hero-bg); padding: 54px 20px 36px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .profile-name { font-size: 20px; font-weight: 700; color: #fff; }
+    .profile-spec { font-size: 13px; color: rgba(255,255,255,0.72); }
+    .profile-email { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .profile-body { background: var(--bg); border-radius: var(--radius-xl) var(--radius-xl) 0 0; margin-top: -18px; flex: 1; padding-top: 28px; overflow-y: auto; scrollbar-width: none; }
+    .profile-body::-webkit-scrollbar { display: none; }
+
+    /* ── TAB CONTENT ─────────────────────────────────────────── */
+    #screen-main { display: none; flex-direction: column; }
+    #screen-main.active { display: flex; }
+    .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .tab-content.active { display: flex; }
+
+    /* ── PATIENT DETAIL SCREEN ───────────────────────────────── */
+    #screen-patient-detail .app-header { background: transparent; border-bottom: none; position: absolute; top: 44px; left: 0; right: 0; z-index: 10; }
+    #screen-patient-detail .screen-body { padding-bottom: 100px; }
+
+    /* ── PATIENT CHAT SCREEN ─────────────────────────────────── */
+    #screen-patient-chat { flex-direction: column; }
+
+    /* ── ANIMATIONS ──────────────────────────────────────────── */
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeIn 0.28s ease forwards; }
+
+    /* ── GOLD GLOW EFFECT ────────────────────────────────────── */
+    .gold-glow { box-shadow: 0 0 0 2px rgba(201,162,39,0.25), 0 4px 20px rgba(201,162,39,0.2); }
+
+    /* ── MEDICAL ONLY BANNER ─────────────────────────────────── */
+    .medical-only-banner {
+      margin: 0 16px 12px;
+      padding: 10px 14px;
+      background: var(--primary-soft);
+      border: 1px solid rgba(11,107,67,0.25);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    body.dark .medical-only-banner { border-color: rgba(0,212,168,0.25); }
+    .medical-only-banner span { font-size: 12px; color: var(--primary); font-weight: 500; line-height: 1.4; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  SPLASH                                                  -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-splash">
+    <div class="splash-logo-wrap">
+      <div class="splash-pulse"></div>
+      <div class="splash-pulse2"></div>
+      <img class="splash-logo-img" src="logo.png" alt="AI Doctor Helper" />
+    </div>
+    <div class="splash-title">AI Doctor <span class="splash-gold">Helper</span></div>
+    <div class="splash-sub">AI Clinical Assistant</div>
+    <div class="splash-loader">
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  LOGIN                                                   -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-login">
+    <div class="auth-bg">
+      <div class="auth-top">
+        <div class="auth-logo"><img src="logo.png" alt="logo" /></div>
+        <div class="auth-title">Welcome back</div>
+        <div class="auth-sub">Sign in to your clinical account</div>
+      </div>
+      <div class="auth-card">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input class="input-field" type="email" placeholder="doctor@hospital.com" />
+          <div class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input class="input-field" type="password" placeholder="••••••••" id="login-pass" />
+          <div class="input-icon" onclick="togglePw('login-pass',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        </div>
+        <div style="text-align:right;margin-bottom:20px;"><span style="font-size:13px;color:var(--gold);font-weight:600;cursor:pointer;">Forgot Password?</span></div>
+        <button class="btn btn-primary" onclick="showScreen('main')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Sign In
+        </button>
+        <div class="divider"><span>or continue with</span></div>
+        <button class="social-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <button class="social-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--text)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Continue with Apple
+        </button>
+        <div class="auth-footer">Don't have an account? <a onclick="showScreen('signup')">Sign up</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  SIGNUP                                                  -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-signup">
+    <div class="auth-bg">
+      <div class="auth-top">
+        <div class="auth-logo"><img src="logo.png" alt="logo" /></div>
+        <div class="auth-title">Create Account</div>
+        <div class="auth-sub">Join AI Doctor Helper today</div>
+      </div>
+      <div class="auth-card">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input class="input-field" type="text" placeholder="Dr. John Smith" />
+          <div class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input class="input-field" type="email" placeholder="doctor@hospital.com" />
+          <div class="input-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input class="input-field" type="password" placeholder="••••••••" id="signup-pass" />
+          <div class="input-icon" onclick="togglePw('signup-pass',this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        </div>
+        <div class="input-group" style="margin-bottom:20px;">
+          <label>Confirm Password</label>
+          <input class="input-field" type="password" placeholder="••••••••" />
+        </div>
+        <button class="btn btn-primary" onclick="showScreen('main')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Create Account
+        </button>
+        <div class="divider"><span>or sign up with</span></div>
+        <button class="social-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Sign up with Google
+        </button>
+        <button class="social-btn" style="margin-bottom:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--text)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Sign up with Apple
+        </button>
+        <div class="auth-footer">Already have an account? <a onclick="showScreen('login')">Sign in</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  MAIN APP                                                -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-main">
+
+    <!-- TAB: PATIENTS ──────────────────────────────────────── -->
+    <div class="tab-content active" id="tab-patients">
+      <div class="status-bar" style="flex-shrink:0;"><span class="time">9:41</span><div class="status-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
+      <div class="app-header">
+        <div>
+          <div class="h2">Patients</div>
+          <div class="caption">4 active patients</div>
+        </div>
+        <button style="padding:0 14px;height:34px;border-radius:var(--radius-md);background:var(--gold-soft);color:var(--gold);font-size:12px;font-weight:600;border:1px solid rgba(201,162,39,0.25);">Filter</button>
+      </div>
+      <div class="screen-body" style="padding-bottom:90px;padding-top:12px;">
+        <div class="search-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input placeholder="Search patients..." />
+        </div>
+        <div class="section-header">
+          <span class="h3">Recent Patients</span>
+          <span style="font-size:13px;color:var(--gold);font-weight:600;cursor:pointer;">See all</span>
+        </div>
+        <div id="patient-list"></div>
+      </div>
+      <button class="fab" aria-label="Add patient">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- TAB: AI ASSISTANT (GLOBAL) ─────────────────────────── -->
+    <div class="tab-content" id="tab-ai">
+      <!-- Dark hero header -->
+      <div class="global-ai-header">
+        <div class="status-bar light-bar" style="padding:0;height:auto;margin-bottom:16px;">
+          <span class="time" style="color:#fff;">9:41</span>
+          <div class="status-icons" style="color:#fff;"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div>
+        </div>
+        <div class="global-ai-header-inner">
+          <div class="avatar avatar-md avatar-ai" style="border:2px solid rgba(0,212,168,0.4);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:#fff;">Medical AI Assistant</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);">General clinical knowledge base</div>
+          </div>
+          <div class="global-ai-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            Live
+          </div>
+        </div>
+        <div class="global-ai-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,168,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>This assistant handles <strong style="color:rgba(255,255,255,0.9);">medical queries only</strong> — symptoms, diagnoses, drug info, protocols, and clinical guidance.</span>
+        </div>
+      </div>
+      <!-- Chat -->
+      <div class="chat-area" id="global-chat-messages">
+        <div class="bubble-row fade-in">
+          <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+          </div>
+          <div class="bubble-wrap">
+            <div class="bubble bubble-ai">Hello Dr. Mitchell! I'm your <strong>Medical AI Assistant</strong>. Ask me anything — drug interactions, differential diagnoses, treatment protocols, clinical guidelines, or any medical topic. I'm here exclusively for clinical queries.</div>
+            <div class="bubble-time">9:41 AM</div>
+          </div>
+        </div>
+      </div>
+      <!-- Input bar -->
+      <div class="input-bar">
+        <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+        <input class="input-bar-field" id="global-chat-input" placeholder="Ask a medical question…" onkeydown="if(event.key==='Enter'){sendGlobalMessage();}" />
+        <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+        <button class="input-bar-btn send-btn" onclick="sendGlobalMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+
+    <!-- TAB: PROFILE ───────────────────────────────────────── -->
+    <div class="tab-content" id="tab-profile">
+      <div class="screen-body" style="padding-bottom:90px;">
+        <div class="profile-hero">
+          <div style="height:44px;"></div>
+          <div class="avatar avatar-xl avatar-doc gold-glow" style="border:3px solid rgba(201,162,39,0.5);">SM</div>
+          <div class="profile-name">Dr. Sarah Mitchell</div>
+          <div class="profile-spec">Internal Medicine · MBBS, MD</div>
+          <div class="profile-email">sarah.mitchell@aidrhelper.com</div>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <span class="badge badge-teal">✓ Verified Doctor</span>
+            <span class="badge badge-gold">Pro Plan</span>
+          </div>
+        </div>
+        <div class="profile-body">
+          <div style="padding:0 20px;margin-bottom:8px;margin-top:4px;">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-weight:700;">Account</div>
+          </div>
+          <div class="card" style="margin:0 20px 20px;border-radius:var(--radius-lg);">
+            <div class="settings-list">
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--primary-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                <span class="settings-label">Edit Profile</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--gold-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+                <span class="settings-label">Subscription</span>
+                <span class="badge badge-gold" style="font-size:10px;">Pro</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding:0 20px;margin-bottom:8px;">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-weight:700;">Preferences</div>
+          </div>
+          <div class="card" style="margin:0 20px 20px;border-radius:var(--radius-lg);">
+            <div class="settings-list">
+              <div class="settings-item">
+                <div class="settings-icon" style="background:#0A1F14;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+                <span class="settings-label">Dark Mode</span>
+                <div class="toggle" id="theme-toggle" onclick="toggleTheme(this)"></div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:#0A2010;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+                <span class="settings-label">Notifications</span>
+                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--primary-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <span class="settings-label">Privacy Policy</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div class="settings-item">
+                <div class="settings-icon" style="background:var(--gold-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                <span class="settings-label">Help &amp; Support</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+          <div style="padding:0 20px;margin-bottom:20px;">
+            <button class="btn btn-danger" onclick="showScreen('login')" style="gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sign Out
+            </button>
+          </div>
+          <div style="text-align:center;padding-bottom:20px;">
+            <div class="caption">AI Doctor Helper v2.4.1</div>
+            <div style="font-size:11px;color:var(--text-xmuted);margin-top:2px;">© 2026 AI Doctor Helper, Inc.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV ─────────────────────────────────────────── -->
+    <div class="bottom-nav">
+      <button class="nav-item active" id="nav-0" onclick="switchTab(0)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-label">Patients</span>
+      </button>
+      <button class="nav-item" id="nav-1" onclick="switchTab(1)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span class="nav-label">AI Assistant</span>
+      </button>
+      <button class="nav-item" id="nav-2" onclick="switchTab(2)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-label">Profile</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  PATIENT DETAIL                                          -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-patient-detail">
+    <div class="app-header">
+      <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('main')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span style="color:#fff;font-size:15px;font-weight:600;">Patient Details</span>
+      <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+      </button>
+    </div>
+    <div class="screen-body" style="padding-bottom:100px;">
+      <div class="detail-hero" style="padding-top:90px;">
+        <div class="detail-hero-top">
+          <div class="avatar avatar-lg avatar-1" id="detail-avatar">AR</div>
+          <div class="detail-hero-info">
+            <div class="detail-hero-name" id="detail-name">Ahmed Al-Rashid</div>
+            <div class="detail-hero-meta" id="detail-meta">45 years old · Male</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+              <span class="badge" style="background:rgba(201,162,39,0.2);color:var(--gold);font-size:10px;" id="detail-badge1">Hypertension</span>
+              <span class="badge" style="background:rgba(0,212,168,0.2);color:#00D4A8;font-size:10px;" id="detail-badge2">T2 Diabetes</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <div class="detail-stat-val" id="detail-consultations">12</div>
+            <div class="detail-stat-label">Consultations</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-val">2d</div>
+            <div class="detail-stat-label">Last Visit</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-val">3</div>
+            <div class="detail-stat-label">Reports</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <div class="section-label">Clinical Notes</div>
+          <div class="detail-note" id="detail-notes">Patient has a 5-year history of hypertension managed on Amlodipine 5mg. Type 2 Diabetes diagnosed 3 years ago, on Metformin 500mg BD. Last HbA1c: 7.4%. Compliant with medications. No known drug allergies.</div>
+        </div>
+        <div class="detail-section">
+          <div class="section-label">Uploaded Reports</div>
+          <div style="padding:0 20px;display:flex;flex-wrap:wrap;">
+            <div class="report-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Blood Test.pdf</div>
+            <div class="report-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>ECG Report.jpg</div>
+            <div class="report-chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Lipid Panel.pdf</div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="section-label">Consultation History</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+              <div class="timeline-body">
+                <div class="timeline-title">AI Consultation — Hypertension Review</div>
+                <div class="timeline-sub">May 18, 2026 · BP 158/96 · Medication adjusted</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+              <div class="timeline-body">
+                <div class="timeline-title">Routine Follow-up — Diabetes Management</div>
+                <div class="timeline-sub">May 10, 2026 · HbA1c 7.4% · Stable</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div>
+              <div class="timeline-body">
+                <div class="timeline-title">Lipid Panel Review</div>
+                <div class="timeline-sub">Apr 28, 2026 · LDL elevated · Statin discussed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-cta-bar">
+      <button class="btn btn-gold" onclick="openPatientChat()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Start AI Consultation
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!--  PATIENT AI CHAT                                         -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-patient-chat">
+    <!-- Header -->
+    <div style="background:var(--hero-bg);flex-shrink:0;">
+      <div class="status-bar light-bar"><span class="time" style="color:#fff;">9:41</span><div class="status-icons" style="color:#fff;"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 16px;">
+        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('patient-detail')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="avatar avatar-md avatar-1" id="pchat-avatar">AR</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:700;color:#fff;" id="pchat-name">Ahmed Al-Rashid</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="pchat-meta">45 y/o · Male · Hypertension</div>
+        </div>
+        <button onclick="showScreen('patient-detail')" style="padding:6px 12px;border-radius:999px;background:rgba(201,162,39,0.2);border:1px solid rgba(201,162,39,0.4);color:var(--gold);font-size:11px;font-weight:600;">Records</button>
+      </div>
+    </div>
+    <!-- Medical only notice -->
+    <div class="medical-only-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Patient-linked consultation · AI has access to <strong id="pchat-context-name">Ahmed</strong>'s medical history</span>
+    </div>
+    <!-- Chat -->
+    <div class="chat-area" id="patient-chat-messages">
+      <div class="bubble-row fade-in">
+        <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="bubble-wrap">
+          <div class="bubble bubble-ai" id="pchat-greeting">Hello Dr. Mitchell. I've reviewed <strong>Ahmed Al-Rashid's</strong> history — Hypertension (5 yrs, Amlodipine 5mg) and Type 2 Diabetes (HbA1c 7.4%, Metformin 500mg BD). How can I assist with today's consultation?</div>
+          <div class="bubble-time">9:41 AM</div>
+        </div>
+      </div>
+      <!-- Seeded conversation -->
+      <div class="bubble-row doctor fade-in">
+        <div class="bubble-wrap">
+          <div class="bubble bubble-doctor">Patient complains of persistent headache, blurred vision, and fatigue for 3 days. BP reading is 158/96.</div>
+          <div class="bubble-time">9:33 AM</div>
+        </div>
+      </div>
+      <div class="bubble-row fade-in">
+        <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="bubble-wrap">
+          <div class="bubble bubble-ai">
+            <div style="margin-bottom:10px;">BP 158/96 with these symptoms warrants careful evaluation. Here's my clinical analysis for Ahmed:</div>
+            <div class="collapsible-group">
+              <div class="collapsible open">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>🔍 Symptoms</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="collapsible-body">Persistent headache (3 days), blurred vision, fatigue, BP 158/96 mmHg — consistent with hypertensive urgency in a known HTN patient on current regimen.</div>
+              </div>
+              <div class="collapsible">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>📋 Findings</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="collapsible-body">Stage 2 hypertension despite Amlodipine 5mg. Blurred vision may suggest hypertensive retinopathy. Concurrent T2DM (HbA1c 7.4%) compounds cardiovascular risk.</div>
+              </div>
+              <div class="collapsible">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>⚕️ Possible Conditions</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="collapsible-body">1. Hypertensive urgency (primary)<br>2. Hypertensive retinopathy (blurred vision)<br>3. Hypoglycaemia secondary to Metformin<br>4. Tension headache (less likely)</div>
+              </div>
+              <div class="collapsible">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>💊 Recommendations</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="collapsible-body">Consider increasing Amlodipine to 10mg or adding ACE inhibitor. Monitor BP q15 min × 1 hour. Check blood glucose. Ophthalmology referral if vision persists.</div>
+              </div>
+              <div class="collapsible">
+                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>🧪 Suggested Tests</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+                <div class="collapsible-body">• Fasting glucose + HbA1c<br>• RFT (Creatinine, BUN)<br>• Lipid panel<br>• 12-lead ECG<br>• Fundoscopy (urgent)</div>
+              </div>
+            </div>
+          </div>
+          <div class="bubble-time">9:34 AM · AI</div>
+        </div>
+      </div>
+    </div>
+    <!-- Input -->
+    <div class="input-bar">
+      <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+      <input class="input-bar-field" id="patient-chat-input" placeholder="Type about this patient…" onkeydown="if(event.key==='Enter'){sendPatientMessage();}" />
+      <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+      <button class="input-bar-btn send-btn" onclick="sendPatientMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+</div><!-- /phone-frame -->
+
+<script>
+  /* ── DATA ────────────────────────────────────────────────── */
+  const patients = [
+    { id:0, name:'Ahmed Al-Rashid', age:45, gender:'Male', diagnosis:'Hypertension, Type 2 Diabetes', lastActivity:'2h ago', avatar:'AR', avatarClass:'avatar-1', notes:'Patient has a 5-year history of hypertension managed on Amlodipine 5mg. Type 2 Diabetes diagnosed 3 years ago, on Metformin 500mg BD. Last HbA1c: 7.4%. No known drug allergies.', badge1:'Hypertension', badge2:'T2 Diabetes', consultations:12 },
+    { id:1, name:'Fatima Hassan', age:32, gender:'Female', diagnosis:'Migraine, Iron Deficiency Anemia', lastActivity:'Yesterday', avatar:'FH', avatarClass:'avatar-2', notes:'Recurrent migraines (chronic), managed on Sumatriptan PRN. Iron deficiency — Ferrous sulfate 200mg daily. Serum ferritin 8 ng/mL. Last attack 4 days ago.', badge1:'Migraine', badge2:'Anaemia', consultations:7 },
+    { id:2, name:'Raj Patel', age:58, gender:'Male', diagnosis:'COPD, Osteoarthritis', lastActivity:'3 days ago', avatar:'RP', avatarClass:'avatar-3', notes:'COPD Stage II — Tiotropium inhaler + Salbutamol PRN. Osteoarthritis bilateral knees. Smoker 20 pack-years, advised cessation. Pulmonary function test pending.', badge1:'COPD Stage II', badge2:'Osteoarthritis', consultations:18 },
+    { id:3, name:'Maria Santos', age:27, gender:'Female', diagnosis:'Anxiety Disorder, GERD', lastActivity:'1 week ago', avatar:'MS', avatarClass:'avatar-4', notes:'Generalised anxiety disorder — Escitalopram 10mg daily, responding well. GERD managed with Omeprazole 20mg OD. Referred to psychotherapy concurrently.', badge1:'Anxiety Disorder', badge2:'GERD', consultations:5 },
+  ];
+
+  let selectedPatient = patients[0];
+  let isDark = false;
+  let globalTyping = false;
+  let patientTyping = false;
+
+  /* ── NAVIGATION ──────────────────────────────────────────── */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const t = document.getElementById('screen-' + id);
+    if (t) { t.classList.add('active'); }
+  }
+
+  function switchTab(i) {
+    ['tab-patients','tab-ai','tab-profile'].forEach((t,idx) => {
+      document.getElementById(t).classList.toggle('active', idx === i);
+      document.getElementById('nav-' + idx).classList.toggle('active', idx === i);
+    });
+  }
+
+  /* ── PATIENTS ────────────────────────────────────────────── */
+  function renderPatients() {
+    document.getElementById('patient-list').innerHTML = patients.map((p, i) => `
+      <div class="patient-card" onclick="openPatient(${i})">
+        <div class="avatar avatar-md ${p.avatarClass}">${p.avatar}</div>
+        <div class="patient-card-body">
+          <div class="patient-card-name">${p.name}</div>
+          <div class="patient-card-meta">${p.age} y/o · ${p.gender}</div>
+          <div class="patient-card-diag">${p.diagnosis}</div>
+          <div class="patient-card-time">Last active ${p.lastActivity}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="badge badge-green" style="font-size:10px;">Active</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function openPatient(i) {
+    selectedPatient = patients[i];
+    const p = selectedPatient;
+    document.getElementById('detail-avatar').textContent = p.avatar;
+    document.getElementById('detail-avatar').className  = `avatar avatar-lg ${p.avatarClass}`;
+    document.getElementById('detail-name').textContent  = p.name;
+    document.getElementById('detail-meta').textContent  = `${p.age} years old · ${p.gender}`;
+    document.getElementById('detail-notes').textContent = p.notes;
+    document.getElementById('detail-badge1').textContent = p.badge1;
+    document.getElementById('detail-badge2').textContent = p.badge2;
+    document.getElementById('detail-consultations').textContent = p.consultations;
+    showScreen('patient-detail');
+  }
+
+  /* ── OPEN PATIENT CHAT ───────────────────────────────────── */
+  function openPatientChat() {
+    const p = selectedPatient;
+    document.getElementById('pchat-avatar').textContent = p.avatar;
+    document.getElementById('pchat-avatar').className   = `avatar avatar-md ${p.avatarClass}`;
+    document.getElementById('pchat-name').textContent   = p.name;
+    document.getElementById('pchat-meta').textContent   = `${p.age} y/o · ${p.gender} · ${p.badge1}`;
+    document.getElementById('pchat-context-name').textContent = p.name.split(' ')[0];
+    // Update greeting
+    document.getElementById('pchat-greeting').innerHTML =
+      `Hello Dr. Mitchell. I've reviewed <strong>${p.name}'s</strong> history — ${p.badge1} and ${p.badge2}. How can I assist with today's consultation?`;
+    showScreen('patient-chat');
+  }
+
+  /* ── THEME ───────────────────────────────────────────────── */
+  function toggleTheme(btn) {
+    isDark = !isDark;
+    document.body.classList.toggle('dark', isDark);
+    if (btn) btn.classList.toggle('on', isDark);
+  }
+
+  /* ── PASSWORD ────────────────────────────────────────────── */
+  function togglePw(id, el) {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    const hide = inp.type === 'password';
+    inp.type = hide ? 'text' : 'password';
+    el.innerHTML = hide
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+
+  /* ── COLLAPSIBLE ─────────────────────────────────────────── */
+  function toggleCollapsible(el) { el.classList.toggle('open'); }
+
+  /* ── GLOBAL CHAT ─────────────────────────────────────────── */
+  const globalResponses = {
+    'hypertension': 'The 2023 ESC/ESH guidelines recommend initiating antihypertensive therapy at BP ≥140/90 mmHg. First-line agents: ACE inhibitors, ARBs, CCBs, or thiazide diuretics. Target BP <130/80 mmHg for most patients, especially those with diabetes or CKD.',
+    'drug interaction': 'Metformin + Amlodipine: No direct clinically significant interaction. However, Amlodipine can cause peripheral oedema which may mimic fluid retention. Monitor renal function periodically when combining with Metformin, as contrast agents or dehydration risk lactic acidosis.',
+    'chest pain': 'Chest pain differential diagnosis: \n1. ACS (STEMI/NSTEMI/UA) — urgent ECG\n2. Aortic dissection — tearing pain radiating to back\n3. PE — pleuritic, dyspnoea\n4. Pericarditis — positional, friction rub\n5. GERD — burning, post-meal\n6. Musculoskeletal — reproducible on palpation\n7. Anxiety/panic — associated symptoms',
+    'lab reference': 'Common reference ranges: Hb 13.5–17.5 g/dL (M), 12–15.5 g/dL (F) · WBC 4,500–11,000 /µL · Platelets 150–400K · Na 136–145 mEq/L · K 3.5–5.1 mEq/L · Creatinine 0.7–1.3 mg/dL · HbA1c <5.7% normal, 5.7–6.4% prediabetes, ≥6.5% diabetes.',
+    'antibiotic': 'Common antibiotic dosing (adult): Amoxicillin 500mg TDS · Azithromycin 500mg OD × 3d · Ciprofloxacin 500mg BD · Metronidazole 400mg TDS · Co-amoxiclav 625mg TDS · Doxycycline 100mg BD. Always check allergy status and local resistance patterns.',
+  };
+
+  function sendGlobalMessage() {
+    const inp = document.getElementById('global-chat-input');
+    const text = (inp.value || '').trim();
+    if (!text || globalTyping) return;
+    inp.value = '';
+    appendBubble('global-chat-messages', text, 'doctor');
+    globalTyping = true;
+    const t = appendTyping('global-chat-messages');
+    setTimeout(() => {
+      t.remove();
+      globalTyping = false;
+      const key = Object.keys(globalResponses).find(k => text.toLowerCase().includes(k));
+      const reply = key ? globalResponses[key] : `That's a great clinical question. Based on current medical literature and guidelines, I recommend consulting the relevant clinical pathway. Could you provide more specific details about the patient's presentation or the medication in question? I can then give you a more precise evidence-based answer.`;
+      appendBubble('global-chat-messages', reply, 'ai');
+    }, 1200 + Math.random()*600);
+  }
+
+  function handleGlobalChip(text) {
+    document.getElementById('global-chat-input').value = text;
+    sendGlobalMessage();
+  }
+
+  /* ── PATIENT CHAT ────────────────────────────────────────── */
+  const patientResponses = {
+    'Analyze Symptoms': { intro: 'Symptom analysis for {{name}}:', sections: { 'Primary Symptoms': 'Headache (3 days), blurred vision, fatigue, BP 158/96.', 'Risk Context': 'Known HTN on Amlodipine 5mg + T2DM on Metformin. Baseline BP history elevated.', 'Urgency': 'Moderate-high. Same-day BP management required. Ophthalmic review warranted.' } },
+    'Summarize Findings': { intro: 'Clinical summary for {{name}}:', sections: { 'Chief Complaint': 'Headache + blurred vision + fatigue × 3 days.', 'Vitals': 'BP 158/96 mmHg — Stage 2 HTN.', 'Background': 'HTN (5yr) + T2DM (3yr). Amlodipine 5mg + Metformin 500mg BD.', 'Key Concern': 'Possible hypertensive urgency. Retinal involvement to exclude.' } },
+    'Suggest Tests': { intro: 'Investigations for {{name}}:', sections: { 'Urgent': 'BP monitoring q15min. Capillary blood glucose.', 'Blood Panel': 'CBC, RFT, Lipid panel, HbA1c, LFT.', 'Cardiac': 'ECG 12-lead.', 'Ophthalmology': 'Fundoscopy — urgent (blurred vision).', 'Imaging': 'CT head only if neuro symptoms emerge.' } },
+    'Treatment Advice': { intro: 'Treatment plan for {{name}}:', sections: { 'Immediate': 'Seat patient, re-check BP in 15 min. Avoid rapid BP reduction.', 'Medication': 'Increase Amlodipine to 10mg or add ACE inhibitor (Enalapril 5mg OD).', 'Lifestyle': 'Low-sodium diet, DASH diet, weight monitoring, stress reduction.', 'Follow-up': 'BP review in 48–72hr. Ophthalmology within 1 week.' } },
+    'Save consultation notes': { intro: 'Consultation saved for {{name}}:', sections: { 'Summary': 'Hypertensive urgency presentation, BP 158/96.', 'Actions Taken': 'Medication review initiated, investigations ordered.', 'Next Steps': 'Follow-up BP check in 48–72 hours.', 'Status': '✓ Saved to patient record — ' + new Date().toLocaleDateString() } },
+  };
+
+  function sendPatientMessage() {
+    const inp = document.getElementById('patient-chat-input');
+    const text = (inp.value || '').trim();
+    if (!text || patientTyping) return;
+    inp.value = '';
+    appendBubble('patient-chat-messages', text, 'doctor');
+    patientTyping = true;
+    const t = appendTyping('patient-chat-messages');
+    setTimeout(() => {
+      t.remove();
+      patientTyping = false;
+      const key = Object.keys(patientResponses).find(k => text.toLowerCase().includes(k.toLowerCase()));
+      if (key) {
+        appendStructuredAI('patient-chat-messages', patientResponses[key]);
+      } else {
+        const name = selectedPatient ? selectedPatient.name.split(' ')[0] : 'the patient';
+        appendBubble('patient-chat-messages', `Noted. Based on ${name}'s current clinical picture — ${selectedPatient.badge1} and ${selectedPatient.badge2} — I recommend a thorough assessment. Please share any additional vitals or symptoms for a more precise clinical analysis.`, 'ai');
+      }
+    }, 1300 + Math.random()*700);
+  }
+
+  function handlePatientChip(text) {
+    document.getElementById('patient-chat-input').value = text;
+    sendPatientMessage();
+  }
+
+  /* ── SHARED CHAT HELPERS ─────────────────────────────────── */
+  function appendBubble(containerId, text, type) {
+    const now  = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const row  = document.createElement('div');
+    row.className = `bubble-row ${type === 'doctor' ? 'doctor' : ''} fade-in`;
+    if (type === 'doctor') {
+      row.innerHTML = `<div class="bubble-wrap"><div class="bubble bubble-doctor">${esc(text)}</div><div class="bubble-time">${now}</div></div>`;
+    } else {
+      row.innerHTML = `
+        <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="bubble-wrap"><div class="bubble bubble-ai">${esc(text).replace(/\n/g,'<br>')}</div><div class="bubble-time">${now} · AI</div></div>`;
+    }
+    document.getElementById(containerId).appendChild(row);
+    scroll(containerId);
+  }
+
+  function appendStructuredAI(containerId, response) {
+    const now  = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const name = selectedPatient ? selectedPatient.name : 'the patient';
+    const intro = response.intro.replace('{{name}}', name);
+    const sections = Object.entries(response.sections).map(([t,b]) => `
+      <div class="collapsible">
+        <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)">
+          <span>${t}</span>
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="collapsible-body">${b}</div>
+      </div>`).join('');
+    const row = document.createElement('div');
+    row.className = 'bubble-row fade-in';
+    row.innerHTML = `
+      <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+      </div>
+      <div class="bubble-wrap">
+        <div class="bubble bubble-ai">
+          <div style="margin-bottom:10px;">${intro}</div>
+          <div class="collapsible-group">${sections}</div>
+        </div>
+        <div class="bubble-time">${now} · AI</div>
+      </div>`;
+    document.getElementById(containerId).appendChild(row);
+    scroll(containerId);
+  }
+
+  function appendTyping(containerId) {
+    const row = document.createElement('div');
+    row.className = 'bubble-row fade-in';
+    row.innerHTML = `
+      <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+      </div>
+      <div class="bubble bubble-ai" style="padding:8px 14px;">
+        <div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+      </div>`;
+    document.getElementById(containerId).appendChild(row);
+    scroll(containerId);
+    return row;
+  }
+
+  function scroll(id) {
+    const el = document.getElementById(id);
+    if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 60);
+  }
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(t));
+    return d.innerHTML;
+  }
+
+  /* ── INIT ────────────────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', () => {
+    renderPatients();
+    setTimeout(() => showScreen('login'), 2600);
+  });
+</script>
+</body>
+</html>
