@@ -301,6 +301,13 @@
     .bubble-time { font-size: 10px; color: var(--text-xmuted); margin-top: 5px; padding: 0 4px; }
     .bubble-row.doctor .bubble-time { text-align: right; color: var(--text-xmuted); }
 
+    /* ── AI FORMATTED RESPONSE ──────────────────────────────── */
+    .bubble-wrap.wide { max-width: 90%; }
+    .ai-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .ai-sec-head { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; letter-spacing: 0.1px; }
+    .ai-sec-body { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+    .ai-sec-body br { display: block; margin-top: 3px; }
+
     /* ── COLLAPSIBLES ────────────────────────────────────────── */
     .collapsible-group { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
     .collapsible { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
@@ -903,30 +910,28 @@
         <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
         </div>
-        <div class="bubble-wrap">
+        <div class="bubble-wrap wide">
           <div class="bubble bubble-ai">
             <div style="margin-bottom:10px;">BP 158/96 with these symptoms warrants careful evaluation. Here's my clinical analysis for Ahmed:</div>
-            <div class="collapsible-group">
-              <div class="collapsible open">
-                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>🔍 Symptoms</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
-                <div class="collapsible-body">Persistent headache (3 days), blurred vision, fatigue, BP 158/96 mmHg — consistent with hypertensive urgency in a known HTN patient on current regimen.</div>
-              </div>
-              <div class="collapsible">
-                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>📋 Findings</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
-                <div class="collapsible-body">Stage 2 hypertension despite Amlodipine 5mg. Blurred vision may suggest hypertensive retinopathy. Concurrent T2DM (HbA1c 7.4%) compounds cardiovascular risk.</div>
-              </div>
-              <div class="collapsible">
-                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>⚕️ Possible Conditions</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
-                <div class="collapsible-body">1. Hypertensive urgency (primary)<br>2. Hypertensive retinopathy (blurred vision)<br>3. Hypoglycaemia secondary to Metformin<br>4. Tension headache (less likely)</div>
-              </div>
-              <div class="collapsible">
-                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>💊 Recommendations</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
-                <div class="collapsible-body">Consider increasing Amlodipine to 10mg or adding ACE inhibitor. Monitor BP q15 min × 1 hour. Check blood glucose. Ophthalmology referral if vision persists.</div>
-              </div>
-              <div class="collapsible">
-                <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)"><span>🧪 Suggested Tests</span><svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
-                <div class="collapsible-body">• Fasting glucose + HbA1c<br>• RFT (Creatinine, BUN)<br>• Lipid panel<br>• 12-lead ECG<br>• Fundoscopy (urgent)</div>
-              </div>
+            <div class="ai-section">
+              <div class="ai-sec-head">🔍 Symptoms</div>
+              <div class="ai-sec-body">Persistent headache (3 days), blurred vision, fatigue, BP 158/96 mmHg — consistent with hypertensive urgency in a known HTN patient on current regimen.</div>
+            </div>
+            <div class="ai-section">
+              <div class="ai-sec-head">📋 Findings</div>
+              <div class="ai-sec-body">Stage 2 hypertension despite Amlodipine 5mg. Blurred vision may suggest hypertensive retinopathy. Concurrent T2DM (HbA1c 7.4%) compounds cardiovascular risk.</div>
+            </div>
+            <div class="ai-section">
+              <div class="ai-sec-head">⚕️ Possible Conditions</div>
+              <div class="ai-sec-body">1. Hypertensive urgency (primary)<br>2. Hypertensive retinopathy (blurred vision)<br>3. Hypoglycaemia secondary to Metformin<br>4. Tension headache (less likely)</div>
+            </div>
+            <div class="ai-section">
+              <div class="ai-sec-head">💊 Recommendations</div>
+              <div class="ai-sec-body">Consider increasing Amlodipine to 10mg or adding ACE inhibitor. Monitor BP q15 min × 1 hour. Check blood glucose. Ophthalmology referral if vision persists.</div>
+            </div>
+            <div class="ai-section">
+              <div class="ai-sec-head">🧪 Suggested Tests</div>
+              <div class="ai-sec-body">• Fasting glucose + HbA1c<br>• RFT (Creatinine, BUN)<br>• Lipid panel<br>• 12-lead ECG<br>• Fundoscopy (urgent)</div>
             </div>
           </div>
           <div class="bubble-time">9:34 AM · AI</div>
@@ -1338,24 +1343,19 @@
     const now  = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     const name = selectedPatient ? selectedPatient.name : 'the patient';
     const intro = response.intro.replace('{{name}}', name);
-    const sections = Object.entries(response.sections).map(([t,b]) => `
-      <div class="collapsible">
-        <div class="collapsible-header" onclick="toggleCollapsible(this.parentElement)">
-          <span>${t}</span>
-          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div class="collapsible-body">${b}</div>
-      </div>`).join('');
+    const sections = Object.entries(response.sections).map(([t, b]) =>
+      `<div class="ai-section"><div class="ai-sec-head">${t}</div><div class="ai-sec-body">${b.replace(/\n/g,'<br>')}</div></div>`
+    ).join('');
     const row = document.createElement('div');
     row.className = 'bubble-row fade-in';
     row.innerHTML = `
       <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
       </div>
-      <div class="bubble-wrap">
+      <div class="bubble-wrap wide">
         <div class="bubble bubble-ai">
           <div style="margin-bottom:10px;">${intro}</div>
-          <div class="collapsible-group">${sections}</div>
+          ${sections}
         </div>
         <div class="bubble-time">${now} · AI</div>
       </div>`;
