@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>AI Doctor Helper</title>
+  <title>Hikma Assist</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -64,7 +64,7 @@
       --input-bg:     #0D1F14;
       --nav-bg:       rgba(6,14,9,0.92);
       --splash-bg:    linear-gradient(155deg,#030806 0%,#081A10 50%,#0A2418 100%);
-      --hero-bg:      linear-gradient(155deg,#030806 0%,#081A10 50%,#0A2418 100%);
+      --hero-bg:      linear-gradient(155deg,#030806 0%,#8ed3ad 50%,#0A2418 100%);
     }
 
     html, body {
@@ -92,7 +92,7 @@
     .status-bar { display: none !important; }
     .auth-top { padding-top: calc(env(safe-area-inset-top, 0px) + 36px) !important; }
     .global-ai-header { padding-top: calc(env(safe-area-inset-top, 0px) + 20px) !important; }
-    .profile-hero { padding-top: calc(env(safe-area-inset-top, 0px) + 24px) !important; }
+    .profile-hero { padding-top: calc(env(safe-area-inset-top, 0px) + 70px) !important; }
     #tab-patients .app-header { padding-top: calc(env(safe-area-inset-top, 0px) + 14px) !important; }
     #screen-patient-detail .app-header { top: env(safe-area-inset-top, 0px) !important; }
     #screen-patient-chat > div:first-child { padding-top: calc(env(safe-area-inset-top, 0px) + 4px) !important; }
@@ -481,6 +481,234 @@
     .select-field { width:100%; height:52px; background:var(--input-bg); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:0 16px; font-size:15px; color:var(--text); appearance:none; cursor:pointer; transition:border-color 0.2s; }
     .select-field:focus { border-color:var(--primary); outline:none; }
 
+    /* ── CHATGPT-STYLE TOP BAR ───────────────────────────────── */
+    .gpt-topbar {
+      position: relative;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      z-index: 5;
+    }
+    .gpt-topbar .icon-btn-round {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--input-bg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text); transition: background 0.15s;
+    }
+    .gpt-topbar .icon-btn-round:active { background: var(--border); }
+    .gpt-topbar-title {
+      font-size: 16px; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .gpt-topbar-title .dot { width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal); }
+    .gpt-topbar .profile-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 13px;
+      background: linear-gradient(135deg,#0B6B43,#C9A227);
+      border: 2px solid rgba(201,162,39,0.4);
+    }
+
+    /* ── EMPTY-STATE LANDING ─────────────────────────────────── */
+    .gpt-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px 20px; gap: 20px; text-align: center;
+    }
+    .gpt-empty-logo {
+      width: 72px; height: 72px; border-radius: 22px;
+      background: linear-gradient(135deg,#0B6B43,#00B89A);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 28px rgba(11,107,67,0.25);
+    }
+    .gpt-empty-title {
+      font-size: 22px; font-weight: 700; color: var(--text);
+    }
+    .gpt-empty-sub {
+      font-size: 13px; color: var(--text-muted); max-width: 280px; line-height: 1.5;
+    }
+    .gpt-suggest-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      width: 100%; max-width: 380px; margin-top: 8px;
+    }
+    .gpt-suggest {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 12px 14px;
+      text-align: left; cursor: pointer; transition: all 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .gpt-suggest:active { transform: scale(0.97); background: var(--input-bg); }
+    .gpt-suggest-head { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .gpt-suggest-sub  { font-size: 11px; color: var(--text-muted); }
+
+    /* ── DRAWER ──────────────────────────────────────────────── */
+    .drawer-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+      z-index: 200;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: absolute; top: 0; left: 0; bottom: 0;
+      width: 86%; max-width: 320px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      transform: translateX(-105%);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 201;
+      display: flex; flex-direction: column;
+      box-shadow: 8px 0 32px rgba(0,0,0,0.2);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header {
+      padding: calc(env(safe-area-inset-top, 0px) + 18px) 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      background: var(--hero-bg);
+    }
+    .drawer-header img { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid rgba(201,162,39,0.4); }
+    .drawer-header-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .drawer-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    .drawer-body {
+      flex: 1; overflow-y: auto; padding: 14px 12px;
+      scrollbar-width: none;
+    }
+    .drawer-body::-webkit-scrollbar { display: none; }
+    .drawer-mrn {
+      width: 100%; display: flex; align-items: center; gap: 12px;
+      padding: 14px 14px; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary) 0%, #0a8f5a 100%);
+      color: #fff; font-size: 15px; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(11,107,67,0.3);
+      margin-bottom: 18px; cursor: pointer; transition: transform 0.15s;
+    }
+    .drawer-mrn:active { transform: scale(0.98); }
+    .drawer-mrn-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .drawer-mrn-sub { font-size: 11px; font-weight: 500; opacity: 0.85; margin-top: 1px; }
+    .drawer-section-label {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.7px;
+      padding: 4px 8px 8px;
+    }
+    .drawer-chat-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: var(--radius-md);
+      cursor: pointer; transition: background 0.15s;
+      margin-bottom: 2px;
+    }
+    .drawer-chat-item:active { background: var(--input-bg); }
+    .drawer-chat-item .avatar { width: 32px; height: 32px; font-size: 12px; }
+    .drawer-chat-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .drawer-chat-snippet { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .drawer-chat-body { flex: 1; min-width: 0; }
+    .drawer-footer {
+      border-top: 1px solid var(--border);
+      padding: 12px 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .drawer-footer .avatar { width: 36px; height: 36px; font-size: 13px; flex-shrink: 0; }
+    .drawer-footer-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .drawer-footer-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* ── ATTACHMENT ACTION SHEET ─────────────────────────────── */
+    .sheet-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.5);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s;
+      z-index: 300;
+    }
+    .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+    .action-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: 12px 14px calc(env(safe-area-inset-bottom, 0px) + 20px);
+      transform: translateY(105%);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 301;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.25);
+    }
+    .action-sheet.open { transform: translateY(0); }
+    .action-sheet-grab {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: var(--border);
+      margin: 4px auto 14px;
+    }
+    .action-sheet-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.7px; text-align: center; margin-bottom: 12px; }
+    .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .action-item {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 14px 8px; border-radius: var(--radius-md);
+      background: var(--input-bg); cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+    .action-item:active { transform: scale(0.95); background: var(--primary-soft); }
+    .action-icon {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+    }
+    .action-icon.ecg   { background: linear-gradient(135deg,#EF4444,#F87171); }
+    .action-icon.photo { background: linear-gradient(135deg,#0B6B43,#00B89A); }
+    .action-icon.pdf   { background: linear-gradient(135deg,#C9A227,#E8C84A); }
+    .action-icon.voice { background: linear-gradient(135deg,#6366F1,#8B5CF6); }
+    .action-label { font-size: 12px; font-weight: 600; color: var(--text); }
+
+    /* ── EDIT PATIENT MODAL ──────────────────────────────────── */
+    .modal-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s;
+      z-index: 400;
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: var(--card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      width: 100%;
+      padding: 14px 20px calc(env(safe-area-inset-bottom, 0px) + 20px);
+      transform: translateY(20px);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      max-height: 88%;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .modal-card::-webkit-scrollbar { display: none; }
+    .modal-overlay.open .modal-card { transform: translateY(0); }
+    .modal-grab {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: var(--border);
+      margin: 0 auto 14px;
+    }
+    .modal-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .modal-actions .btn { height: 46px; font-size: 14px; }
+
+    /* ── ASK HIKMA FAB ───────────────────────────────────────── */
+    .fab-ask {
+      position: absolute; bottom: 20px; right: 20px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 18px; height: 50px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--primary) 0%, #00B89A 100%);
+      color: #fff; font-size: 14px; font-weight: 700;
+      box-shadow: 0 8px 24px rgba(11,107,67,0.4);
+      z-index: 50; transition: transform 0.18s;
+    }
+    .fab-ask:active { transform: scale(0.96); }
+
     /* ── MEDICAL ONLY BANNER ─────────────────────────────────── */
     .medical-only-banner {
       margin: 0 16px 12px;
@@ -508,9 +736,9 @@
     <div class="splash-logo-wrap">
       <div class="splash-pulse"></div>
       <div class="splash-pulse2"></div>
-      <img class="splash-logo-img" src="logo.png" alt="AI Doctor Helper" />
+      <img class="splash-logo-img" src="logo.png" alt="Hikma Assist" />
     </div>
-    <div class="splash-title">AI Doctor <span class="splash-gold">Helper</span></div>
+    <div class="splash-title">Hikma <span class="splash-gold">Assist</span></div>
     <div class="splash-sub">AI Clinical Assistant</div>
     <div class="splash-loader">
       <div class="splash-dot"></div>
@@ -567,7 +795,7 @@
       <div class="auth-top">
         <div class="auth-logo"><img src="logo.png" alt="logo" /></div>
         <div class="auth-title">Create Account</div>
-        <div class="auth-sub">Join AI Doctor Helper today</div>
+        <div class="auth-sub">Join Hikma Assist today</div>
       </div>
       <div class="auth-card">
         <div class="input-group">
@@ -612,82 +840,100 @@
   <!-- ════════════════════════════════════════════════════════ -->
   <div class="screen" id="screen-main">
 
-    <!-- TAB: PATIENTS ──────────────────────────────────────── -->
-    <div class="tab-content active" id="tab-patients">
-      <div class="status-bar" style="flex-shrink:0;"><span class="time">9:41</span><div class="status-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
-      <div class="app-header">
-        <div>
-          <div class="h2">Patients</div>
-          <div class="caption">4 active patients</div>
-        </div>
-        <button style="padding:0 14px;height:34px;border-radius:var(--radius-md);background:var(--gold-soft);color:var(--gold);font-size:12px;font-weight:600;border:1px solid rgba(201,162,39,0.25);">Filter</button>
+    <!-- TAB: PATIENTS (MRN — opened from drawer) ──────────── -->
+    <div class="tab-content" id="tab-patients">
+      <div class="gpt-topbar">
+        <button class="icon-btn-round" onclick="openDrawer()" aria-label="Open menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="gpt-topbar-title">MRN · Patients</div>
+        <button class="profile-avatar" onclick="switchTab(2)" aria-label="Profile">SM</button>
       </div>
-      <div class="screen-body" style="padding-bottom:90px;padding-top:12px;">
+      <div class="screen-body" style="padding-bottom:110px;padding-top:14px;">
         <div class="search-bar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input placeholder="Search patients..." />
         </div>
         <div class="section-header">
           <span class="h3">Recent Patients</span>
-          <span style="font-size:13px;color:var(--gold);font-weight:600;cursor:pointer;">See all</span>
+          <span style="font-size:12px;color:var(--text-muted);">Long-press to edit</span>
         </div>
         <div id="patient-list"></div>
       </div>
-      <button class="fab" aria-label="Add patient" onclick="showScreen('create-patient')">
+      <button class="fab" aria-label="Add patient" onclick="showScreen('create-patient')" style="bottom:20px;">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="fab-ask" onclick="switchTab(1)" aria-label="Ask Hikma Assist" style="bottom:20px;left:20px;right:auto;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Ask Hikma
       </button>
     </div>
 
-    <!-- TAB: AI ASSISTANT (GLOBAL) ─────────────────────────── -->
-    <div class="tab-content" id="tab-ai" style="padding-bottom:82px;">
-      <!-- Dark hero header -->
-      <div class="global-ai-header">
-        <div class="status-bar light-bar" style="padding:0;height:auto;margin-bottom:16px;">
-          <span class="time" style="color:#fff;">9:41</span>
-          <div class="status-icons" style="color:#fff;"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div>
-        </div>
-        <div class="global-ai-header-inner">
-          <div class="avatar avatar-md avatar-ai" style="border:2px solid rgba(0,212,168,0.4);">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
+    <!-- TAB: AI ASSISTANT (LANDING — ChatGPT-style) ────────── -->
+    <div class="tab-content active" id="tab-ai">
+      <!-- Top bar: hamburger left, title center, profile avatar right -->
+      <div class="gpt-topbar">
+        <button class="icon-btn-round" onclick="openDrawer()" aria-label="Open menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="gpt-topbar-title"><span class="dot"></span> Hikma Assist</div>
+        <button class="profile-avatar" onclick="switchTab(2)" aria-label="Profile">SM</button>
+      </div>
+
+      <!-- Chat area (also holds empty state) -->
+      <div class="chat-area" id="global-chat-messages">
+        <div id="gpt-empty-state" class="gpt-empty fade-in">
+          <div class="gpt-empty-logo">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
           </div>
           <div>
-            <div style="font-size:16px;font-weight:700;color:#fff;">Medical AI Assistant</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);">General clinical knowledge base</div>
+            <div class="gpt-empty-title">Hi, Dr. Mitchell</div>
+            <div class="gpt-empty-sub">Ask Hikma Assist anything clinical — drug interactions, differentials, protocols, dosing, guidelines.</div>
           </div>
-          <div class="global-ai-badge">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-            Live
-          </div>
-        </div>
-        <div class="global-ai-notice">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,168,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span>This assistant handles <strong style="color:rgba(255,255,255,0.9);">medical queries only</strong> — symptoms, diagnoses, drug info, protocols, and clinical guidance.</span>
-        </div>
-      </div>
-      <!-- Chat -->
-      <div class="chat-area" id="global-chat-messages">
-        <div class="bubble-row fade-in">
-          <div class="avatar avatar-sm avatar-ai" style="flex-shrink:0;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9.96 9.96 0 017.071 2.929A9.96 9.96 0 0122 12v0a10 10 0 01-10 10A10 10 0 012 12v0C2 6.477 6.477 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg>
-          </div>
-          <div class="bubble-wrap">
-            <div class="bubble bubble-ai">Hello Dr. Mitchell! I'm your <strong>Medical AI Assistant</strong>. Ask me anything — drug interactions, differential diagnoses, treatment protocols, clinical guidelines, or any medical topic. I'm here exclusively for clinical queries.</div>
-            <div class="bubble-time">9:41 AM</div>
+          <div class="gpt-suggest-grid">
+            <button class="gpt-suggest" onclick="handleGlobalChip('Hypertension management')">
+              <div class="gpt-suggest-head">Hypertension</div>
+              <div class="gpt-suggest-sub">2023 ESC/ESH targets</div>
+            </button>
+            <button class="gpt-suggest" onclick="handleGlobalChip('Drug interaction check')">
+              <div class="gpt-suggest-head">Drug interactions</div>
+              <div class="gpt-suggest-sub">Quick safety check</div>
+            </button>
+            <button class="gpt-suggest" onclick="handleGlobalChip('Chest pain differential')">
+              <div class="gpt-suggest-head">Chest pain</div>
+              <div class="gpt-suggest-sub">Differential dx</div>
+            </button>
+            <button class="gpt-suggest" onclick="handleGlobalChip('Lab reference ranges')">
+              <div class="gpt-suggest-head">Lab ranges</div>
+              <div class="gpt-suggest-sub">Common values</div>
+            </button>
           </div>
         </div>
       </div>
+
       <!-- Input bar -->
       <div class="input-bar">
-        <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
-        <input class="input-bar-field" id="global-chat-input" placeholder="Ask a medical question…" onkeydown="if(event.key==='Enter'){sendGlobalMessage();}" />
-        <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-        <button class="input-bar-btn send-btn" onclick="sendGlobalMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        <button class="input-bar-btn icon-btn" onclick="openAttachSheet('global')" aria-label="Add attachment">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <input class="input-bar-field" id="global-chat-input" placeholder="Ask Hikma Assist…" onkeydown="if(event.key==='Enter'){sendGlobalMessage();}" />
+        <button class="input-bar-btn icon-btn" aria-label="Voice"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+        <button class="input-bar-btn send-btn" onclick="sendGlobalMessage()" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
       </div>
     </div>
 
     <!-- TAB: PROFILE ───────────────────────────────────────── -->
     <div class="tab-content" id="tab-profile">
-      <div class="screen-body" style="padding-bottom:90px;">
+      <div class="gpt-topbar" style="background:transparent;border-bottom:none;position:absolute;top:0;left:0;right:0;z-index:6;">
+        <button class="icon-btn-round" onclick="switchTab(1)" style="background:rgba(255,255,255,0.18);color:#fff;" aria-label="Back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="gpt-topbar-title" style="color:#fff;">Profile</div>
+        <button class="icon-btn-round" onclick="openDrawer()" style="background:rgba(255,255,255,0.18);color:#fff;" aria-label="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="screen-body" style="padding-bottom:30px;">
         <div class="profile-hero">
           <div class="avatar avatar-xl avatar-doc gold-glow" style="border:3px solid rgba(201,162,39,0.5);">SM</div>
           <div class="profile-name">Dr. Sarah Mitchell</div>
@@ -750,27 +996,118 @@
             </button>
           </div>
           <div style="text-align:center;padding-bottom:20px;">
-            <div class="caption">AI Doctor Helper v2.4.1</div>
-            <div style="font-size:11px;color:var(--text-xmuted);margin-top:2px;">© 2026 AI Doctor Helper, Inc.</div>
+            <div class="caption">Hikma Assist v2.4.1</div>
+            <div style="font-size:11px;color:var(--text-xmuted);margin-top:2px;">© 2026 Hikma Assist, Inc.</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- BOTTOM NAV ─────────────────────────────────────────── -->
-    <div class="bottom-nav">
-      <button class="nav-item active" id="nav-0" onclick="switchTab(0)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <span class="nav-label">Patients</span>
-      </button>
-      <button class="nav-item" id="nav-1" onclick="switchTab(1)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        <span class="nav-label">AI Assistant</span>
-      </button>
-      <button class="nav-item" id="nav-2" onclick="switchTab(2)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="nav-label">Profile</span>
-      </button>
+    <!-- DRAWER (Side Menu) ─────────────────────────────────── -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+      <div class="drawer-header">
+        <img src="logo.png" alt="logo" />
+        <div>
+          <div class="drawer-header-title">Hikma Assist</div>
+          <div class="drawer-header-sub">AI Clinical Assistant</div>
+        </div>
+      </div>
+      <div class="drawer-body">
+        <button class="drawer-mrn" onclick="goToMRN()">
+          <div class="drawer-mrn-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div style="text-align:left;flex:1;">
+            <div>MRN</div>
+            <div class="drawer-mrn-sub">Medical record numbers · Patients</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="drawer-section-label">Recent Chats</div>
+        <div id="drawer-recent-chats"></div>
+      </div>
+      <div class="drawer-footer">
+        <div class="avatar avatar-doc" style="width:36px;height:36px;font-size:13px;">SM</div>
+        <div style="flex:1;min-width:0;">
+          <div class="drawer-footer-name">Dr. Sarah Mitchell</div>
+          <div class="drawer-footer-sub">Internal Medicine</div>
+        </div>
+        <button class="icon-btn-round" onclick="closeDrawer();switchTab(2);" aria-label="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ATTACHMENT ACTION SHEET ────────────────────────────── -->
+    <div class="sheet-overlay" id="sheet-overlay" onclick="closeAttachSheet()"></div>
+    <div class="action-sheet" id="attach-sheet">
+      <div class="action-sheet-grab"></div>
+      <div class="action-sheet-title">Attach</div>
+      <div class="action-grid">
+        <div class="action-item" onclick="pickAttachment('ECG')">
+          <div class="action-icon ecg">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="action-label">ECG</div>
+        </div>
+        <div class="action-item" onclick="pickAttachment('Photo')">
+          <div class="action-icon photo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="action-label">Photo</div>
+        </div>
+        <div class="action-item" onclick="pickAttachment('PDF')">
+          <div class="action-icon pdf">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="action-label">PDF</div>
+        </div>
+        <div class="action-item" onclick="pickAttachment('Voice Note')">
+          <div class="action-icon voice">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </div>
+          <div class="action-label">Voice Note</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT PATIENT MODAL ─────────────────────────────────── -->
+    <div class="modal-overlay" id="edit-modal-overlay" onclick="if(event.target===this)closeEditModal()">
+      <div class="modal-card">
+        <div class="modal-grab"></div>
+        <div class="modal-title" id="edit-modal-title">Edit Patient</div>
+        <div class="modal-sub">Update the patient's main details</div>
+        <div class="input-group">
+          <label>Full Name</label>
+          <input class="input-field" type="text" id="edit-name" placeholder="Patient full name" />
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:12px;">
+          <div style="flex:1;">
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px;">Age</label>
+            <input class="input-field" type="number" id="edit-age" placeholder="e.g. 35" min="0" max="120" style="padding:0 16px;" />
+          </div>
+          <div style="flex:1;">
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px;">Gender</label>
+            <div style="position:relative;">
+              <select class="select-field" id="edit-gender">
+                <option>Male</option><option>Female</option><option>Other</option>
+              </select>
+              <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Primary Diagnosis</label>
+          <input class="input-field" type="text" id="edit-diagnosis" placeholder="e.g. Hypertension" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEditPatient()">Save Changes</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -940,10 +1277,12 @@
     </div>
     <!-- Input -->
     <div class="input-bar">
-      <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button>
+      <button class="input-bar-btn icon-btn" onclick="openAttachSheet('patient')" aria-label="Add attachment">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
       <input class="input-bar-field" id="patient-chat-input" placeholder="Type about this patient…" onkeydown="if(event.key==='Enter'){sendPatientMessage();}" />
-      <button class="input-bar-btn icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-      <button class="input-bar-btn send-btn" onclick="sendPatientMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      <button class="input-bar-btn icon-btn" aria-label="Voice"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+      <button class="input-bar-btn send-btn" onclick="sendPatientMessage()" aria-label="Send"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>
   </div>
 
@@ -1173,6 +1512,10 @@
   let isDark = false;
   let globalTyping = false;
   let patientTyping = false;
+  let attachContext = 'global'; // which chat the sheet targets
+  let editingPatientId = null;
+  let lpTimer = null;
+  let lpFired = false;
 
   /* ── NAVIGATION ──────────────────────────────────────────── */
   function showScreen(id) {
@@ -1184,14 +1527,19 @@
   function switchTab(i) {
     ['tab-patients','tab-ai','tab-profile'].forEach((t,idx) => {
       document.getElementById(t).classList.toggle('active', idx === i);
-      document.getElementById('nav-' + idx).classList.toggle('active', idx === i);
     });
+    closeDrawer();
   }
 
   /* ── PATIENTS ────────────────────────────────────────────── */
   function renderPatients() {
     document.getElementById('patient-list').innerHTML = patients.map((p, i) => `
-      <div class="patient-card" onclick="openPatient(${i})">
+      <div class="patient-card"
+           onpointerdown="patientLPStart(event, ${i})"
+           onpointerup="patientLPEnd(event, ${i})"
+           onpointerleave="patientLPCancel()"
+           onpointercancel="patientLPCancel()"
+           oncontextmenu="event.preventDefault();openEditPatient(${i});return false;">
         <div class="avatar avatar-md ${p.avatarClass}">${p.avatar}</div>
         <div class="patient-card-body">
           <div class="patient-card-name">${p.name}</div>
@@ -1204,6 +1552,104 @@
           <span class="badge badge-green" style="font-size:10px;">Active</span>
         </div>
       </div>`).join('');
+    renderDrawerRecentChats();
+  }
+
+  /* ── LONG-PRESS ─────────────────────────────────────────── */
+  function patientLPStart(e, i) {
+    lpFired = false;
+    clearTimeout(lpTimer);
+    lpTimer = setTimeout(() => {
+      lpFired = true;
+      if (navigator.vibrate) navigator.vibrate(40);
+      openEditPatient(i);
+    }, 550);
+  }
+  function patientLPEnd(e, i) {
+    clearTimeout(lpTimer);
+    if (!lpFired) openPatient(i);
+  }
+  function patientLPCancel() {
+    clearTimeout(lpTimer);
+  }
+
+  /* ── EDIT PATIENT MODAL ─────────────────────────────────── */
+  function openEditPatient(i) {
+    editingPatientId = i;
+    const p = patients[i];
+    document.getElementById('edit-modal-title').textContent = `Edit ${p.name.split(' ')[0]}`;
+    document.getElementById('edit-name').value      = p.name;
+    document.getElementById('edit-age').value       = p.age;
+    document.getElementById('edit-gender').value    = p.gender;
+    document.getElementById('edit-diagnosis').value = p.diagnosis;
+    document.getElementById('edit-modal-overlay').classList.add('open');
+  }
+  function closeEditModal() {
+    document.getElementById('edit-modal-overlay').classList.remove('open');
+    editingPatientId = null;
+  }
+  function saveEditPatient() {
+    if (editingPatientId === null) return closeEditModal();
+    const p = patients[editingPatientId];
+    const name = (document.getElementById('edit-name').value || '').trim() || p.name;
+    p.name      = name;
+    p.age       = parseInt(document.getElementById('edit-age').value) || p.age;
+    p.gender    = document.getElementById('edit-gender').value || p.gender;
+    p.diagnosis = (document.getElementById('edit-diagnosis').value || '').trim() || p.diagnosis;
+    p.avatar    = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    p.lastActivity = 'Just edited';
+    renderPatients();
+    closeEditModal();
+  }
+
+  /* ── DRAWER ─────────────────────────────────────────────── */
+  function openDrawer() {
+    renderDrawerRecentChats();
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawer-overlay').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawer-overlay').classList.remove('open');
+  }
+  function goToMRN() {
+    closeDrawer();
+    switchTab(0);
+  }
+  function renderDrawerRecentChats() {
+    const el = document.getElementById('drawer-recent-chats');
+    if (!el) return;
+    el.innerHTML = patients.map((p, i) => `
+      <div class="drawer-chat-item" onclick="openPatientFromDrawer(${i})">
+        <div class="avatar ${p.avatarClass}">${p.avatar}</div>
+        <div class="drawer-chat-body">
+          <div class="drawer-chat-name">${p.name}</div>
+          <div class="drawer-chat-snippet">${p.diagnosis} · ${p.lastActivity}</div>
+        </div>
+      </div>`).join('');
+  }
+  function openPatientFromDrawer(i) {
+    closeDrawer();
+    openPatient(i);
+  }
+
+  /* ── ATTACHMENT SHEET ───────────────────────────────────── */
+  function openAttachSheet(ctx) {
+    attachContext = ctx;
+    document.getElementById('attach-sheet').classList.add('open');
+    document.getElementById('sheet-overlay').classList.add('open');
+  }
+  function closeAttachSheet() {
+    document.getElementById('attach-sheet').classList.remove('open');
+    document.getElementById('sheet-overlay').classList.remove('open');
+  }
+  function pickAttachment(kind) {
+    closeAttachSheet();
+    const inputId = attachContext === 'patient' ? 'patient-chat-input' : 'global-chat-input';
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    inp.value = `[${kind} attached] `;
+    inp.focus();
   }
 
   function openPatient(i) {
@@ -1269,6 +1715,8 @@
     const text = (inp.value || '').trim();
     if (!text || globalTyping) return;
     inp.value = '';
+    const empty = document.getElementById('gpt-empty-state');
+    if (empty) empty.remove();
     appendBubble('global-chat-messages', text, 'doctor');
     globalTyping = true;
     const t = appendTyping('global-chat-messages');
