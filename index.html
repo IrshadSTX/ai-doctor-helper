@@ -64,7 +64,7 @@
       --input-bg:     #0D1F14;
       --nav-bg:       rgba(6,14,9,0.92);
       --splash-bg:    linear-gradient(155deg,#030806 0%,#081A10 50%,#0A2418 100%);
-      --hero-bg:      linear-gradient(155deg,#030806 0%,#8ed3ad 50%,#0A2418 100%);
+      --hero-bg:      linear-gradient(155deg,#04100A 0%,#0B2E1E 45%,#062014 75%,#040C08 100%);
     }
 
     html, body {
@@ -959,7 +959,6 @@
           <div class="profile-email" id="profile-email-display">sarah.mitchell@aidrhelper.com</div>
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
             <span class="badge badge-teal">✓ Verified Doctor</span>
-            <span class="badge badge-gold">Pro Plan</span>
             <span class="badge" id="profile-dept-badge" style="background:rgba(0,184,154,0.18);color:var(--teal);border:1px solid rgba(0,184,154,0.3);">🏥 Outpatient · OPD</span>
           </div>
         </div>
@@ -973,11 +972,6 @@
                 <div class="settings-icon" style="background:var(--primary-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
                 <span class="settings-label">Edit Profile</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </div>
-              <div class="settings-item">
-                <div class="settings-icon" style="background:var(--gold-soft);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-                <span class="settings-label">Subscription</span>
-                <span class="badge badge-gold" style="font-size:10px;">Pro</span>
               </div>
             </div>
           </div>
@@ -1135,7 +1129,7 @@
   <!-- ════════════════════════════════════════════════════════ -->
   <div class="screen" id="screen-patient-detail">
     <div class="app-header">
-      <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('main')">
+      <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('patient-chat')" aria-label="Back to chat">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <span style="color:#fff;font-size:15px;font-weight:600;">Patient Details</span>
@@ -1228,15 +1222,19 @@
     <div style="background:var(--hero-bg);flex-shrink:0;">
       <div class="status-bar light-bar"><span class="time" style="color:#fff;">9:41</span><div class="status-icons" style="color:#fff;"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1" opacity=".4"/><rect x="4.5" y="5" width="3" height="7" rx="1" opacity=".6"/><rect x="9" y="2.5" width="3" height="9.5" rx="1" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
       <div style="display:flex;align-items:center;gap:12px;padding:8px 16px 16px;">
-        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('patient-detail')">
+        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="showScreen('main')" aria-label="Back">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <div class="avatar avatar-md avatar-1" id="pchat-avatar">AR</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:15px;font-weight:700;color:#fff;" id="pchat-name">Ahmed Al-Rashid</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="pchat-meta">45 y/o · Male · Hypertension</div>
-        </div>
-        <button onclick="showScreen('patient-detail')" style="padding:6px 12px;border-radius:999px;background:rgba(201,162,39,0.2);border:1px solid rgba(201,162,39,0.4);color:var(--gold);font-size:11px;font-weight:600;">Records</button>
+        <button onclick="showScreen('patient-detail')" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;padding:4px 6px;border-radius:12px;transition:background 0.15s;" onpointerdown="this.style.background='rgba(255,255,255,0.08)'" onpointerup="this.style.background='transparent'" onpointerleave="this.style.background='transparent'" aria-label="View patient details">
+          <div class="avatar avatar-md avatar-1" id="pchat-avatar">AR</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:15px;font-weight:700;color:#fff;" id="pchat-name">Ahmed Al-Rashid</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.65);" id="pchat-meta">45 y/o · Male · Hypertension</div>
+          </div>
+        </button>
       </div>
     </div>
     <!-- Medical only notice -->
@@ -1701,7 +1699,7 @@
     document.getElementById('detail-badge1').textContent = p.badge1;
     document.getElementById('detail-badge2').textContent = p.badge2;
     document.getElementById('detail-consultations').textContent = p.consultations;
-    showScreen('patient-detail');
+    openPatientChat();
   }
 
   /* ── OPEN PATIENT CHAT ───────────────────────────────────── */
