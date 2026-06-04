@@ -1892,6 +1892,141 @@
       margin-top: 3px;
     }
 
+
+    /* ── REPORT VIEWER (gallery) ─────────────────────────────── */
+    .rv-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .rv-meta-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .rv-meta-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .rv-meta-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-xmuted);
+      flex-shrink: 0;
+    }
+
+    .rv-gallery-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .gallery-cell {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .gallery-cell:active {
+      transform: scale(0.97);
+      box-shadow: none;
+    }
+
+    .gallery-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-page {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── LIGHTBOX ────────────────────────────────────────────── */
+    .lightbox {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .lightbox.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox img {
+      max-width: 100%;
+      max-height: 80%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .lightbox-caption {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13px;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 16px);
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* ── EXPANSION TILE ──────────────────────────────────────── */
     .expand-tile {
       background: var(--card);
@@ -1994,8 +2129,8 @@
       font-weight: 700;
       color: #fff;
       font-size: 13px;
-      background: linear-gradient(135deg, #0B6B43, #C9A227);
-      border: 2px solid rgba(201, 162, 39, 0.4);
+      background: linear-gradient(135deg, #0A3B2E, #1AAF78);
+      border: 2px solid rgba(26, 175, 120, 0.45);
     }
 
     /* ── EMPTY-STATE LANDING ─────────────────────────────────── */
@@ -3068,19 +3203,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Report folder viewer -->
-      <div class="modal-overlay" id="folder-modal-overlay" onclick="if(event.target===this)closeReportFolder()">
-        <div class="modal-card">
-          <div class="modal-grab"></div>
-          <div class="modal-title" id="folder-modal-title">🩸 Blood Test</div>
-          <div class="modal-sub" id="folder-modal-sub">Complete reports for this patient</div>
-          <div id="folder-modal-files" style="margin-top:8px;"></div>
-          <div style="margin-top:8px;">
-            <button class="btn btn-outline" onclick="closeReportFolder()">Close</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ════════════════════════════════════════════════════════ -->
@@ -3194,6 +3316,58 @@
           Start AI Consultation
         </button>
       </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!--  REPORT VIEWER (attachment)                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-report-view">
+      <div class="app-header" style="background:var(--hero-bg);border-bottom:none;">
+        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" onclick="backFromReport()"
+          aria-label="Back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <div style="flex:1;min-width:0;text-align:center;">
+          <div id="rv-title" style="color:#fff;font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            Report</div>
+          <div id="rv-subtitle" style="color:rgba(255,255,255,0.6);font-size:11px;">Attachment</div>
+        </div>
+        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;" aria-label="Download">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+      </div>
+      <div class="screen-body" style="background:var(--bg);padding:16px 16px 40px;">
+        <div class="rv-meta-bar">
+          <div>
+            <div class="rv-meta-name" id="rv-pname">—</div>
+            <div class="rv-meta-sub"><span id="rv-page">—</span> · MRN <span id="rv-pmrn">—</span></div>
+          </div>
+          <div class="rv-meta-date" id="rv-date">—</div>
+        </div>
+        <div class="rv-gallery-label"><span id="rv-count">0</span> attachments</div>
+        <div class="gallery-grid" id="rv-gallery"></div>
+      </div>
+    </div>
+
+    <!-- Fullscreen image lightbox -->
+    <div class="lightbox" id="rv-lightbox" onclick="closeLightbox()">
+      <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <img id="rv-lightbox-img" src="" alt="Report attachment" onclick="event.stopPropagation()" />
+      <div class="lightbox-caption" id="rv-lightbox-caption"></div>
     </div>
 
     <!-- ════════════════════════════════════════════════════════ -->
@@ -3501,6 +3675,19 @@
 
     </div>
 
+    <!-- Report folder viewer (global overlay) -->
+    <div class="modal-overlay" id="folder-modal-overlay" onclick="if(event.target===this)closeReportFolder()">
+      <div class="modal-card">
+        <div class="modal-grab"></div>
+        <div class="modal-title" id="folder-modal-title">🩸 Blood Test</div>
+        <div class="modal-sub" id="folder-modal-sub">Complete reports for this patient</div>
+        <div id="folder-modal-files" style="margin-top:8px;"></div>
+        <div style="margin-top:8px;">
+          <button class="btn btn-outline" onclick="closeReportFolder()">Close</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /phone-frame -->
 
   <script>
@@ -3724,14 +3911,17 @@
         </div>`).join('');
     }
 
+    let currentFolderIndex = 0;
+
     function openReportFolder(i) {
+      currentFolderIndex = i;
       const f = reportFolders[i];
       const first = selectedPatient ? selectedPatient.name.split(' ')[0] : 'this patient';
       document.getElementById('folder-modal-title').textContent = `${f.emoji} ${f.name}`;
       document.getElementById('folder-modal-sub').textContent =
         `Complete ${f.name.toLowerCase()} reports for ${first}`;
-      document.getElementById('folder-modal-files').innerHTML = f.reports.map(r => `
-        <div class="report-file">
+      document.getElementById('folder-modal-files').innerHTML = f.reports.map((r, ri) => `
+        <div class="report-file" onclick="openReportView(${i}, ${ri})" style="cursor:pointer;">
           <div class="report-file-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
@@ -3742,12 +3932,61 @@
             <div class="report-file-meta">${r.meta}</div>
             <div class="report-file-date">${r.date}</div>
           </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;align-self:center;"><polyline points="9 18 15 12 9 6"/></svg>
         </div>`).join('');
       document.getElementById('folder-modal-overlay').classList.add('open');
     }
 
     function closeReportFolder() {
       document.getElementById('folder-modal-overlay').classList.remove('open');
+    }
+
+    /* ── REPORT VIEWER (gallery grid of attachments) ─────────── */
+    const REPORT_IMG = 'dummy_report.jpeg';
+
+    function openReportView(fi, ri) {
+      const f = reportFolders[fi];
+      const r = f.reports[ri];
+      const p = selectedPatient || {};
+      closeReportFolder();
+
+      document.getElementById('rv-title').textContent = r.title;
+      document.getElementById('rv-subtitle').textContent = `${f.name} · ${r.date}`;
+      document.getElementById('rv-pname').textContent = p.name || '—';
+      document.getElementById('rv-pmrn').textContent = p.mrn || '—';
+      document.getElementById('rv-page').textContent =
+        (p.age != null ? p.age + ' yrs' : '—') + ' · ' + (p.gender || '—');
+      document.getElementById('rv-date').textContent = r.date;
+
+      // Build a gallery of attachment pages (dummy images)
+      const pages = r.pages || 4;
+      document.getElementById('rv-count').textContent = pages;
+      const cap = `${r.title} — ${r.date}`;
+      let html = '';
+      for (let n = 1; n <= pages; n++) {
+        html += `
+          <div class="gallery-cell" onclick="openLightbox('${cap} · Page ${n}')">
+            <img src="${REPORT_IMG}" alt="${r.title} page ${n}" loading="lazy" />
+            <span class="gallery-page">Page ${n}</span>
+          </div>`;
+      }
+      document.getElementById('rv-gallery').innerHTML = html;
+      showScreen('report-view');
+    }
+
+    function openLightbox(caption) {
+      document.getElementById('rv-lightbox-img').src = REPORT_IMG;
+      document.getElementById('rv-lightbox-caption').textContent = caption || '';
+      document.getElementById('rv-lightbox').classList.add('open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('rv-lightbox').classList.remove('open');
+    }
+
+    function backFromReport() {
+      showScreen('patient-detail');
+      openReportFolder(currentFolderIndex);
     }
 
     function toggleExpand(el) { el.classList.toggle('open'); }
