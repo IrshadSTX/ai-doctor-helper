@@ -3865,27 +3865,50 @@
     /* ── REPORT FOLDERS ──────────────────────────────────────── */
     const reportFolders = [
       {
-        key: 'blood', emoji: '🩸', name: 'Blood Test', reports: [
-          { title: 'Complete Blood Count (CBC)', meta: 'Hb 13.8 g/dL · WBC 7.2K · Platelets 245K', date: 'May 18, 2026' },
-          { title: 'Fasting Blood Glucose', meta: 'FBS 112 mg/dL', date: 'May 10, 2026' },
+        key: 'labs', emoji: '🧪', name: 'Labs', reports: [
+          { title: 'Complete Blood Count (CBC)', meta: 'Hb 13.8 · WBC 7.2K · Platelets 245K', date: 'May 18, 2026' },
+          { title: 'Comprehensive Metabolic Panel (CMP)', meta: 'Na 139 · K 4.2 · Creatinine 1.0', date: 'May 18, 2026' },
           { title: 'HbA1c', meta: '7.4% — fair glycaemic control', date: 'May 10, 2026' },
-          { title: 'Renal Function Test (RFT)', meta: 'Creatinine 1.0 · eGFR 88', date: 'Apr 28, 2026' },
+          { title: 'Troponin I', meta: '< 0.01 ng/mL — normal', date: 'Apr 28, 2026' },
         ]
       },
       {
-        key: 'ecg', emoji: '🫀', name: 'ECG Report', reports: [
+        key: 'ecg', emoji: '🫀', name: 'ECG and Echo', reports: [
           { title: '12-Lead ECG', meta: 'Sinus rhythm · borderline LVH', date: 'May 18, 2026' },
-          { title: '24h Holter Monitor', meta: 'No significant arrhythmia', date: 'Apr 28, 2026' },
+          { title: 'Echocardiogram', meta: 'EF 58% · mild diastolic dysfunction', date: 'Apr 20, 2026' },
+          { title: 'Previous ECG', meta: 'Sinus rhythm · rate 74 bpm', date: 'Feb 12, 2026' },
         ]
       },
       {
-        key: 'lipid', emoji: '🧪', name: 'Lipid Panel', reports: [
-          { title: 'Fasting Lipid Profile', meta: 'LDL 162 · HDL 38 · TG 190 mg/dL', date: 'Apr 28, 2026' },
-        ]
-      },
-      {
-        key: 'imaging', emoji: '🩻', name: 'Imaging', reports: [
+        key: 'radiology', emoji: '🩻', name: 'Radiology', reports: [
           { title: 'Chest X-Ray (PA)', meta: 'No acute cardiopulmonary findings', date: 'Apr 15, 2026' },
+          { title: 'CT Abdomen', meta: 'No acute abnormality', date: 'Mar 30, 2026' },
+          { title: 'Renal Ultrasound', meta: 'Normal size & echotexture', date: 'Mar 02, 2026' },
+        ]
+      },
+      {
+        key: 'culture', emoji: '🦠', name: 'Culture', reports: [
+          { title: 'Urine Culture', meta: 'No significant growth', date: 'May 05, 2026' },
+          { title: 'Blood Culture', meta: 'No growth after 5 days', date: 'Apr 22, 2026' },
+          { title: 'Wound Swab', meta: 'Mixed skin flora', date: 'Mar 18, 2026' },
+        ]
+      },
+      {
+        key: 'biopsy', emoji: '🔬', name: 'Biopsy', reports: [
+          { title: 'Histopathology Report', meta: 'Benign — no malignancy seen', date: 'Feb 18, 2026' },
+        ]
+      },
+      {
+        key: 'notes', emoji: '📝', name: 'Notes', reports: [
+          { title: 'Consultation Note', meta: 'Hypertension review — meds adjusted', date: 'May 18, 2026' },
+          { title: 'AI Summary', meta: 'Hypertensive urgency assessment', date: 'May 18, 2026' },
+          { title: 'Follow-up Note', meta: 'Diabetes management — stable', date: 'May 10, 2026' },
+        ]
+      },
+      {
+        key: 'meds', emoji: '💊', name: 'Medications', reports: [
+          { title: 'Current Prescription', meta: 'Amlodipine · Metformin · Atorvastatin', date: 'May 18, 2026' },
+          { title: 'Previous Prescription', meta: 'Amlodipine 5mg · Metformin 500mg', date: 'Feb 10, 2026' },
         ]
       },
     ];
