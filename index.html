@@ -551,6 +551,10 @@
       margin-bottom: 10px;
     }
 
+    #screen-patient-detail .section-label {
+      color: var(--text);
+    }
+
     /* ── APP HEADER ──────────────────────────────────────────── */
     .app-header {
       padding: 6px 20px 14px;
@@ -1005,7 +1009,7 @@
     }
 
     .input-bar-btn.send-btn {
-      background: var(--primary);
+      background: linear-gradient(135deg, #0A3B2D, #0D5740);
       color: #fff;
     }
 
@@ -1801,11 +1805,16 @@
       padding: 0 20px;
     }
 
+    .folder-tile.folder-full {
+      grid-column: 1 / -1;
+    }
+
     .folder-tile {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 14px;
+      gap: 10px;
+      min-width: 0;
+      padding: 12px;
       border-radius: var(--radius-md);
       background: var(--card);
       border: 1px solid var(--border);
@@ -1815,38 +1824,74 @@
     }
 
     .folder-tile:active {
-      transform: scale(0.97);
+      transform: scale(0.99);
       background: var(--primary-soft);
       border-color: var(--primary);
     }
 
+    .folder-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .folder-upload {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      border: none;
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.15s, color 0.15s;
+    }
+
+    .folder-upload:active {
+      transform: scale(0.92);
+      background: var(--primary);
+      color: #fff;
+    }
+
     .folder-emoji {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 11px;
       background: var(--input-bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 19px;
       flex-shrink: 0;
+      align-self: flex-start;
     }
 
     .folder-info {
+      flex: 1;
       min-width: 0;
     }
 
     .folder-name {
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text);
-      line-height: 1.2;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .folder-name-sub {
+      font-weight: 600;
+      color: var(--text);
     }
 
     .folder-count {
       font-size: 11px;
       color: var(--text-xmuted);
-      margin-top: 2px;
     }
 
     /* ── REPORT FILE ROW (folder viewer) ─────────────────────── */
@@ -1962,6 +2007,38 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .gallery-del {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(220, 53, 69, 0.92);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s;
+      z-index: 2;
+    }
+
+    .gallery-del:active {
+      transform: scale(0.85);
+    }
+
+    .gallery-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-xmuted);
+      font-size: 13px;
+      padding: 36px 16px;
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-md);
     }
 
     .gallery-page {
@@ -2293,11 +2370,11 @@
       gap: 12px;
       padding: 14px 14px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, var(--primary) 0%, #0D6B50 100%);
+      background: linear-gradient(135deg, #0A3B2D 0%, #093F2E 100%);
       color: #fff;
       font-size: 15px;
       font-weight: 700;
-      box-shadow: 0 3px 12px rgba(14, 80, 64, 0.18);
+      box-shadow: 0 3px 12px rgba(7, 40, 30, 0.3);
       margin-bottom: 18px;
       cursor: pointer;
       transition: transform 0.15s;
@@ -3223,14 +3300,7 @@
           </svg>
         </button>
         <span style="color:#fff;font-size:15px;font-weight:600;">Patient Details</span>
-        <button class="back-btn" style="background:rgba(255,255,255,0.15);color:#fff;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="19" cy="12" r="1" />
-            <circle cx="5" cy="12" r="1" />
-          </svg>
-        </button>
+        <div style="width:36px;height:36px;flex-shrink:0;" aria-hidden="true"></div>
       </div>
       <div class="screen-body" style="padding-bottom:100px;">
         <div class="detail-hero" style="padding-top:calc(env(safe-area-inset-top, 0px) + 60px);">
@@ -3270,7 +3340,7 @@
             <div class="folder-grid" id="detail-folders"></div>
           </div>
           <div class="detail-section">
-            <div class="section-label">Consultation History</div>
+            <div class="section-label">Recommendation</div>
             <div class="timeline">
               <div class="timeline-item">
                 <div class="timeline-dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -3374,6 +3444,10 @@
       <img id="rv-lightbox-img" src="" alt="Report attachment" onclick="event.stopPropagation()" />
       <div class="lightbox-caption" id="rv-lightbox-caption"></div>
     </div>
+
+    <!-- Hidden file input for folder uploads -->
+    <input type="file" id="folder-upload-input" accept="image/*,application/pdf" multiple
+      style="display:none;" onchange="handleFolderUpload(this)" />
 
     <!-- ════════════════════════════════════════════════════════ -->
     <!--  PATIENT AI CHAT                                         -->
@@ -3563,8 +3637,8 @@
             <div style="width:96px;flex-shrink:0;">
               <label
                 style="display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px;">Age</label>
-              <input class="input-field" type="number" id="cp-age" placeholder="—" min="0" max="120" readonly
-                style="padding:0 16px;background:var(--card2);" />
+              <input class="input-field" type="number" id="cp-age" placeholder="—" min="0" max="120"
+                style="padding:0 16px;" />
             </div>
           </div>
 
@@ -3865,7 +3939,7 @@
     /* ── REPORT FOLDERS ──────────────────────────────────────── */
     const reportFolders = [
       {
-        key: 'labs', emoji: '🧪', name: 'Labs', reports: [
+        key: 'labs', emoji: '🧪', name: 'Lab Recommendation', reports: [
           { title: 'Complete Blood Count (CBC)', meta: 'Hb 13.8 · WBC 7.2K · Platelets 245K', date: 'May 18, 2026' },
           { title: 'Comprehensive Metabolic Panel (CMP)', meta: 'Na 139 · K 4.2 · Creatinine 1.0', date: 'May 18, 2026' },
           { title: 'HbA1c', meta: '7.4% — fair glycaemic control', date: 'May 10, 2026' },
@@ -3873,29 +3947,35 @@
         ]
       },
       {
-        key: 'ecg', emoji: '🫀', name: 'ECG and Echo', reports: [
+        key: 'ecg', emoji: '🫀', name: 'ECG and Echo Recommendation', reports: [
           { title: '12-Lead ECG', meta: 'Sinus rhythm · borderline LVH', date: 'May 18, 2026' },
           { title: 'Echocardiogram', meta: 'EF 58% · mild diastolic dysfunction', date: 'Apr 20, 2026' },
           { title: 'Previous ECG', meta: 'Sinus rhythm · rate 74 bpm', date: 'Feb 12, 2026' },
         ]
       },
       {
-        key: 'radiology', emoji: '🩻', name: 'Radiology', reports: [
+        key: 'radiology', emoji: '🩻', name: 'Radiology Recommendation', reports: [
           { title: 'Chest X-Ray (PA)', meta: 'No acute cardiopulmonary findings', date: 'Apr 15, 2026' },
           { title: 'CT Abdomen', meta: 'No acute abnormality', date: 'Mar 30, 2026' },
           { title: 'Renal Ultrasound', meta: 'Normal size & echotexture', date: 'Mar 02, 2026' },
         ]
       },
       {
-        key: 'culture', emoji: '🦠', name: 'Culture', reports: [
+        key: 'culture', emoji: '🦠', name: 'Culture Recommendation', reports: [
           { title: 'Urine Culture', meta: 'No significant growth', date: 'May 05, 2026' },
           { title: 'Blood Culture', meta: 'No growth after 5 days', date: 'Apr 22, 2026' },
           { title: 'Wound Swab', meta: 'Mixed skin flora', date: 'Mar 18, 2026' },
         ]
       },
       {
-        key: 'biopsy', emoji: '🔬', name: 'Biopsy', reports: [
+        key: 'biopsy', emoji: '🔬', name: 'Biopsy Recommendation', reports: [
           { title: 'Histopathology Report', meta: 'Benign — no malignancy seen', date: 'Feb 18, 2026' },
+        ]
+      },
+      {
+        key: 'meds', emoji: '💊', name: 'Medications Recommendation', reports: [
+          { title: 'Current Prescription', meta: 'Amlodipine · Metformin · Atorvastatin', date: 'May 18, 2026' },
+          { title: 'Previous Prescription', meta: 'Amlodipine 5mg · Metformin 500mg', date: 'Feb 10, 2026' },
         ]
       },
       {
@@ -3905,25 +3985,54 @@
           { title: 'Follow-up Note', meta: 'Diabetes management — stable', date: 'May 10, 2026' },
         ]
       },
-      {
-        key: 'meds', emoji: '💊', name: 'Medications', reports: [
-          { title: 'Current Prescription', meta: 'Amlodipine · Metformin · Atorvastatin', date: 'May 18, 2026' },
-          { title: 'Previous Prescription', meta: 'Amlodipine 5mg · Metformin 500mg', date: 'Feb 10, 2026' },
-        ]
-      },
     ];
 
     function renderDetailFolders() {
       const el = document.getElementById('detail-folders');
       if (!el) return;
       el.innerHTML = reportFolders.map((f, i) => `
-        <div class="folder-tile" onclick="openReportFolder(${i})">
+        <div class="folder-tile${f.key === 'notes' ? ' folder-full' : ''}" onclick="openReportFolder(${i})">
           <div class="folder-emoji">${f.emoji}</div>
           <div class="folder-info">
-            <div class="folder-name">${f.name}</div>
-            <div class="folder-count">${f.reports.length} report${f.reports.length !== 1 ? 's' : ''}</div>
+            <div class="folder-name">${f.name.replace(/ Recommendation$/, '<br><span class="folder-name-sub">Recommendation</span>')}</div>
+            <div class="folder-meta-row">
+              <span class="folder-count">${f.reports.length} report${f.reports.length !== 1 ? 's' : ''}</span>
+              <button class="folder-upload" onclick="event.stopPropagation();uploadToFolder(${i})" aria-label="Upload attachment">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>Upload
+              </button>
+            </div>
           </div>
         </div>`).join('');
+    }
+
+    /* Upload attachment(s) into a folder */
+    let pendingUploadFolder = null;
+    function uploadToFolder(i) {
+      pendingUploadFolder = i;
+      const inp = document.getElementById('folder-upload-input');
+      if (inp) { inp.value = ''; inp.click(); }
+    }
+    function handleFolderUpload(input) {
+      const fi = pendingUploadFolder;
+      if (fi == null || !reportFolders[fi]) return;
+      const files = input.files ? Array.from(input.files) : [];
+      const today = 'Jun 06, 2026';
+      if (!files.length) {
+        // No real file chosen — still add a placeholder attachment for the demo
+        reportFolders[fi].reports.push({ title: 'New Attachment', meta: 'Uploaded just now', date: today });
+      } else {
+        files.forEach(file => {
+          reportFolders[fi].reports.push({
+            title: file.name.replace(/\.[^.]+$/, ''),
+            meta: 'Uploaded just now',
+            date: today,
+          });
+        });
+      }
+      pendingUploadFolder = null;
+      renderDetailFolders();
     }
 
     let currentFolderIndex = 0;
@@ -3946,16 +4055,32 @@
 
       // Each report in the folder is one attachment in the gallery
       document.getElementById('rv-count').textContent = f.reports.length;
-      document.getElementById('rv-gallery').innerHTML = f.reports.map(r => {
-        const cap = `${r.title} — ${r.date}`;
-        return `
+      const gallery = document.getElementById('rv-gallery');
+      if (!f.reports.length) {
+        gallery.innerHTML = `<div class="gallery-empty">No attachments in this folder.</div>`;
+      } else {
+        gallery.innerHTML = f.reports.map((r, ri) => {
+          const cap = `${r.title} — ${r.date}`;
+          return `
           <div class="gallery-cell" onclick="openLightbox(${JSON.stringify(cap).replace(/"/g, '&quot;')})">
             <img src="${REPORT_IMG}" alt="${r.title}" loading="lazy" />
+            <button class="gallery-del" onclick="event.stopPropagation();removeAttachment(${i}, ${ri})" aria-label="Remove attachment">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
             <span class="gallery-page">${r.title}</span>
           </div>`;
-      }).join('');
+        }).join('');
+      }
 
       showScreen('report-view');
+    }
+
+    function removeAttachment(fi, ri) {
+      const f = reportFolders[fi];
+      if (!f || !f.reports[ri]) return;
+      f.reports.splice(ri, 1);
+      openReportFolder(fi);   // re-render gallery with updated indices
+      renderDetailFolders();  // keep folder counts in sync behind the screen
     }
 
     function openLightbox(caption) {
