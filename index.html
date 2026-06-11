@@ -1892,6 +1892,7 @@
     .folder-count {
       font-size: 11px;
       color: var(--text-xmuted);
+      margin-top: 3px;
     }
 
     /* ── REPORT FILE ROW (folder viewer) ─────────────────────── */
@@ -3994,15 +3995,8 @@
         <div class="folder-tile${f.key === 'notes' ? ' folder-full' : ''}" onclick="openReportFolder(${i})">
           <div class="folder-emoji">${f.emoji}</div>
           <div class="folder-info">
-            <div class="folder-name">${f.name.replace(/ Recommendation$/, '<br><span class="folder-name-sub">Recommendation</span>')}</div>
-            <div class="folder-meta-row">
-              <span class="folder-count">${f.reports.length} report${f.reports.length !== 1 ? 's' : ''}</span>
-              <button class="folder-upload" onclick="event.stopPropagation();uploadToFolder(${i})" aria-label="Upload attachment">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>Upload
-              </button>
-            </div>
+            <div class="folder-name">${f.name}</div>
+            <div class="folder-count">${f.reports.length} report${f.reports.length !== 1 ? 's' : ''}</div>
           </div>
         </div>`).join('');
     }
